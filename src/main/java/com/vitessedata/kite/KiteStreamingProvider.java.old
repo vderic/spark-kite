@@ -1,0 +1,32 @@
+package com.vitessedata.kite;
+
+import java.lang.String;
+import java.util.Optional;
+
+import org.apache.spark.internal.Logging;
+import org.apache.spark.sql.sources.DataSourceRegister;
+import org.apache.spark.sql.sources.v2.reader.streaming.MicroBatchReader;
+import org.apache.spark.sql.sources.v2.DataSourceOptions;
+import org.apache.spark.sql.sources.v2.DataSourceV2;
+import org.apache.spark.sql.sources.v2.MicroBatchReadSupport;
+import org.apache.spark.sql.sources.v2.StreamWriteSupport;
+import org.apache.spark.sql.streaming.OutputMode;
+import org.apache.spark.sql.types.StructType;
+
+public class KiteStreamingProvider implements DataSourceV2, MicroBatchReadSupport, DataSourceRegister, Logging {
+
+	public KiteStreamingProvider() {
+	}
+
+	public MicroBatchReader createMicroBatchReader(java.util.Optional<StructType> schema,
+			String checkpointLocation,
+			DataSourceOptions options) {
+
+		return null;
+	}
+
+	public String shortName() {
+		return "kite";
+	}
+}
+
