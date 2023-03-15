@@ -1,6 +1,8 @@
 /* SimpleApp.java */
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.Dataset;
+import org.apache.arrow.vector.IntVector;
+import org.apache.arrow.memory.RootAllocator;
 
 public class SimpleApp {
   public static void main(String[] args) {
@@ -13,6 +15,18 @@ public class SimpleApp {
     long numBs = logData.filter((org.apache.spark.api.java.function.FilterFunction<String>)s -> s.contains("b")).count();
 
     System.out.println("Lines with a: " + numAs + ", lines with b: " + numBs);
+
+    try (
+	    RootAllocator allocator = new RootAllocator(Long.MAX_VALUE);
+	    IntVector intVector = new IntVector("fixed-size", allocator);
+    ){
+	    intVector.allocateNew(3);
+	    intVector.set(0, 1);
+	    intVector.setNull(1);
+	    intVector.set(2, 2);
+	    intVector.setValueCount(3);
+    }
+
 
     spark.stop();
   }
