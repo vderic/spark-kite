@@ -1,1 +1,1 @@
-com.vitessedata.spark.KiteTableProvider
+com.vitessedata.spark.connector.KiteTableProvider
