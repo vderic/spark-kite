@@ -91,7 +91,11 @@ public class XrgIterator {
                 int basz = data.getInt();
                 byte[] ba = new byte[basz];
                 data.get(ba);
-                values[i] = ba;
+                if (ltyp == LogicalTypes.STRING) {
+                    values[i] = new String(ba);
+                } else {
+                    values[i] = ba;
+                }
             }
                 break;
             case PhysicalTypes.INT128: {
