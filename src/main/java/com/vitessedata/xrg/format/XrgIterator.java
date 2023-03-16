@@ -9,6 +9,9 @@ import java.lang.Float;
 import java.lang.Short;
 import java.util.Vector;
 import java.nio.ByteBuffer;
+import org.apache.arrow.vector.util.DecimalUtility;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 public class XrgIterator {
 
@@ -49,6 +52,11 @@ public class XrgIterator {
 
 		int nvec = vector.size();
 		for (int i = 0 ; i < nvec ; i++) {
+			short ptyp = attrs[i].getPhysicalType();
+			short ltyp = attrs[i].getLogicalType();
+			int scale = attrs[i].getScale();
+			int precision = attrs[i].getPrecision();
+
 			ByteBuffer data = data_array[i];
 			ByteBuffer flag = flag_array[i];
 
@@ -65,7 +73,12 @@ public class XrgIterator {
 					values[i] = new Integer(data.getInt());
 					break;
 				case PhysicalTypes.INT64:
-					values[i] = new Long(data.getLong());
+					long int64 = data.getLong();
+					if (ltyp == LogicalTypes.DECIMAL) {
+						values[i] = new BigDecimal(int64).setScale(scale);
+					} else {
+						values[i] = new Long(int64);
+					}
 					break;
 				case PhysicalTypes.FP32:
 					values[i] = new Float(data.getFloat());
@@ -81,13 +94,17 @@ public class XrgIterator {
 					values[i] = ba;
 					}
 					break;
-				default:
-					{
+				case PhysicalTypes.INT128:
+				{
 					int itemsz = attrs[i].getItemSize();
 					byte[] ba = new byte[itemsz];
 					data.get(ba);
-					values[i] = ba;
+					if (ltyp == LogicalTypes.DECIMAL) {
+						values[i] = DecimalUtility.getBigDecimalFromByteBuffer(ByteBuffer.wrap(ba), scale, itemsz);
+					} else {
+						values[i] = new BigInteger(ba);
 					}
+				}
 					break;
 			}
 
