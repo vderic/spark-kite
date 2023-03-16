@@ -56,6 +56,7 @@ public class XrgIterator {
             short ltyp = attrs[i].getLogicalType();
             int scale = attrs[i].getScale();
             int precision = attrs[i].getPrecision();
+            int itemsz = attrs[i].getItemSize();
 
             ByteBuffer data = data_array[i];
             ByteBuffer flag = flag_array[i];
@@ -87,14 +88,13 @@ public class XrgIterator {
                 values[i] = new Double(data.getDouble());
                 break;
             case PhysicalTypes.BYTEA: {
-                int itemsz = data.getInt();
-                byte[] ba = new byte[itemsz];
+                int basz = data.getInt();
+                byte[] ba = new byte[basz];
                 data.get(ba);
                 values[i] = ba;
             }
                 break;
             case PhysicalTypes.INT128: {
-                int itemsz = attrs[i].getItemSize();
                 byte[] ba = new byte[itemsz];
                 data.get(ba);
                 if (ltyp == LogicalTypes.DECIMAL) {
