@@ -13,11 +13,11 @@ public class XrgVector {
     private ByteBuffer data;
     private ByteBuffer flag;
 
-    public XrgVector(byte[] buf) throws IOException {
+    public XrgVector(byte[] buf) {
         init(buf);
     }
 
-    public void init(byte[] buf) throws IOException {
+    private void init(byte[] buf) {
         buffer = buf;
         ByteBuffer headerbuf = ByteBuffer.wrap(buf, 0, XrgVectorHeader.HEADER_SIZE);
         header = XrgVectorHeader.read(headerbuf, new XrgVectorHeader());

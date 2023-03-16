@@ -2,8 +2,8 @@ package com.vitessedata.xrg.format;
 
 import java.io.InputStream;
 import java.util.Arrays;
-import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.lang.RuntimeException;
 
 public class XrgVectorHeader {
     public static final int HEADER_SIZE = 46;
@@ -113,11 +113,11 @@ public class XrgVectorHeader {
         this.ninval = ninval;
     }
 
-    public static XrgVectorHeader read(ByteBuffer from, XrgVectorHeader vechdr) throws IOException {
+    public static XrgVectorHeader read(ByteBuffer from, XrgVectorHeader vechdr) {
         byte[] magic = new byte[4];
         from.get(magic);
         if (Arrays.equals(XRG_MAGIC, magic) == false) {
-            throw new IOException("Wrong Magic");
+            throw new RuntimeException("Wrong Magic");
         }
 
         // read 46 bytes header
