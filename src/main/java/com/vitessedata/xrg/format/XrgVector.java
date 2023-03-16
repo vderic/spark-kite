@@ -31,7 +31,7 @@ public class XrgVector {
             ByteBuffer zbuf = ByteBuffer.wrap(buf, XrgVectorHeader.HEADER_SIZE, zbyte);
 
             LZ4FastDecompressor decompressor = factory.fastDecompressor();
-            ByteBuffer data = ByteBuffer.allocate(nbyte);
+            data = ByteBuffer.allocate(nbyte);
             decompressor.decompress(zbuf, data);
         } else {
             data = ByteBuffer.wrap(buf, XrgVectorHeader.HEADER_SIZE, nbyte);
