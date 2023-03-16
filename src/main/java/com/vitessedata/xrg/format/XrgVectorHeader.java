@@ -6,137 +6,146 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 public class XrgVectorHeader {
-	public static final int HEADER_SIZE = 46;
-	private static final byte[] XRG_MAGIC = {'X', 'R', 'G', '1'};
+    public static final int HEADER_SIZE = 46;
+    private static final byte[] XRG_MAGIC = { 'X', 'R', 'G', '1' };
 
-	private short ptyp = 0;
-	private short ltyp = 0;
-	private short fieldidx = 0;
-	private short itemsz = 0;
-	private short scale = 0;
-	private short precision = 0;
-	private int nbyte = 0;
-	private int zbyte = 0;
-	private int nnull = 0;
-	private int nitem = 0;
-	private int ninval = 0;
+    private short ptyp = 0;
+    private short ltyp = 0;
+    private short fieldidx = 0;
+    private short itemsz = 0;
+    private short scale = 0;
+    private short precision = 0;
+    private int nbyte = 0;
+    private int zbyte = 0;
+    private int nnull = 0;
+    private int nitem = 0;
+    private int ninval = 0;
 
-	public XrgVectorHeader() {
+    public XrgVectorHeader() {
 
-	}
+    }
 
-	public short getPhysicalType(){
-		return ptyp;
-	}
-	public void setPhysicalType(short ptyp) {
-		this.ptyp = ptyp;
-	}
+    public short getPhysicalType() {
+        return ptyp;
+    }
 
-	public short getLogicalType() {
-		return ltyp;
-	}
-	public void setLogicalType(short ltyp) {
-		this.ltyp = ltyp;
-	}
+    public void setPhysicalType(short ptyp) {
+        this.ptyp = ptyp;
+    }
 
-	public short getFieldIdx() {
-		return fieldidx;
-	}
-	public void setFieldIdx(short fieldidx) {
-		this.fieldidx = fieldidx;
-	}
+    public short getLogicalType() {
+        return ltyp;
+    }
 
-	public short getItemSize() {
-		return itemsz;
-	}
-	public void setItemSize(short itemsz) {
-		this.itemsz = itemsz;
-	}
+    public void setLogicalType(short ltyp) {
+        this.ltyp = ltyp;
+    }
 
-	public short getScale() {
-		return scale;
-	}
-	public void setScale(short scale) {
-		this.scale = scale;
-	}
+    public short getFieldIdx() {
+        return fieldidx;
+    }
 
-	public short getPrecision() {
-		return precision;
-	}
-	public void setPrecision(short precision) {
-		this.precision = precision;
-	}
+    public void setFieldIdx(short fieldidx) {
+        this.fieldidx = fieldidx;
+    }
 
-	public int getNByte() {
-		return nbyte;
-	}
-	public void setNByte(int nbyte) {
-		this.nbyte = nbyte;
-	}
+    public short getItemSize() {
+        return itemsz;
+    }
 
-	public int getZByte() {
-		return zbyte;
-	}
-	public void setZByte(int zbyte) {
-		this.zbyte = zbyte;
-	}
+    public void setItemSize(short itemsz) {
+        this.itemsz = itemsz;
+    }
 
-	public int getNNull() {
-		return nnull;
-	}
-	public void setNNull(int nnull) {
-		this.nnull = nnull;
-	}
+    public short getScale() {
+        return scale;
+    }
 
-	public int getNItem() {
-		return nitem;
-	}
-	public void setNItem(int nitem) {
-		this.nitem = nitem;
-	}
+    public void setScale(short scale) {
+        this.scale = scale;
+    }
 
-	public int getNInval() {
-		return ninval;
-	}
-	public void setNInval(int ninval) {
-		this.ninval = ninval;
-	}
+    public short getPrecision() {
+        return precision;
+    }
 
+    public void setPrecision(short precision) {
+        this.precision = precision;
+    }
 
-	public static XrgVectorHeader read(ByteBuffer from, XrgVectorHeader vechdr) throws IOException {
-		byte[] magic = new byte[4];
-		from.get(magic);
-		if (Arrays.equals(XRG_MAGIC, magic) == false) {
-			throw new IOException("Wrong Magic");
-		}
+    public int getNByte() {
+        return nbyte;
+    }
 
-		// read 46 bytes header
-		short ptyp = from.getShort();
-		short ltyp = from.getShort();
-		short fieldidx = from.getShort();
-		short itemsz = from.getShort();
-		short scale = from.getShort();
-		short precision = from.getShort();
-		int nbyte = from.getInt();
-		int zbyte = from.getInt();
-		int nnull = from.getInt();
-		int nitem = from.getInt();
-		int ninval = from.getInt();
-		from.getInt(); // unused int32
-		from.getLong(); // unseud int64
+    public void setNByte(int nbyte) {
+        this.nbyte = nbyte;
+    }
 
-		vechdr.setPhysicalType(ptyp);
-		vechdr.setLogicalType(ltyp);
-		vechdr.setFieldIdx(fieldidx);
-		vechdr.setItemSize(itemsz);
-		vechdr.setScale(scale);
-		vechdr.setPrecision(precision);
-		vechdr.setNByte(nbyte);
-		vechdr.setZByte(zbyte);
-		vechdr.setNNull(nnull);
-		vechdr.setNItem(nitem);
-		vechdr.setNInval(ninval);
-		return vechdr;
-	}
+    public int getZByte() {
+        return zbyte;
+    }
+
+    public void setZByte(int zbyte) {
+        this.zbyte = zbyte;
+    }
+
+    public int getNNull() {
+        return nnull;
+    }
+
+    public void setNNull(int nnull) {
+        this.nnull = nnull;
+    }
+
+    public int getNItem() {
+        return nitem;
+    }
+
+    public void setNItem(int nitem) {
+        this.nitem = nitem;
+    }
+
+    public int getNInval() {
+        return ninval;
+    }
+
+    public void setNInval(int ninval) {
+        this.ninval = ninval;
+    }
+
+    public static XrgVectorHeader read(ByteBuffer from, XrgVectorHeader vechdr) throws IOException {
+        byte[] magic = new byte[4];
+        from.get(magic);
+        if (Arrays.equals(XRG_MAGIC, magic) == false) {
+            throw new IOException("Wrong Magic");
+        }
+
+        // read 46 bytes header
+        short ptyp = from.getShort();
+        short ltyp = from.getShort();
+        short fieldidx = from.getShort();
+        short itemsz = from.getShort();
+        short scale = from.getShort();
+        short precision = from.getShort();
+        int nbyte = from.getInt();
+        int zbyte = from.getInt();
+        int nnull = from.getInt();
+        int nitem = from.getInt();
+        int ninval = from.getInt();
+        from.getInt(); // unused int32
+        from.getLong(); // unseud int64
+
+        vechdr.setPhysicalType(ptyp);
+        vechdr.setLogicalType(ltyp);
+        vechdr.setFieldIdx(fieldidx);
+        vechdr.setItemSize(itemsz);
+        vechdr.setScale(scale);
+        vechdr.setPrecision(precision);
+        vechdr.setNByte(nbyte);
+        vechdr.setZByte(zbyte);
+        vechdr.setNNull(nnull);
+        vechdr.setNItem(nitem);
+        vechdr.setNInval(ninval);
+        return vechdr;
+    }
 }
-

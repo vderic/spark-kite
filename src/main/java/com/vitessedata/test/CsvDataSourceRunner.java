@@ -20,56 +20,59 @@ public class CsvDataSourceRunner {
 
     public static void main(String[] args) {
 
-	if (args.length != 1) {
-		System.out.println("java class csvfile");
-		return;
-	}
+        if (args.length != 1) {
+            System.out.println("java class csvfile");
+            return;
+        }
 
-	String filepath = args[0];
+        String filepath = args[0];
 
-        SparkSession sparkSession = SparkSession.builder()
-                .appName("data_source_test")
-                .getOrCreate();
+        SparkSession sparkSession = SparkSession.builder().appName("data_source_test").getOrCreate();
 
-        //Dataset<Row> dataset = sparkSession.read().schema(getSchema()).format("com.bugdbug.customsource.csv.CSV").option("fileName", "/home/ubuntu/p/big-data-projects/Datasource spark3/src/test/resources/1000 Sales Records.csv").load();
-        Dataset<Row> dataset = sparkSession.read().schema(getSchema()).format("kite")
-                .option("fileName", filepath).load();
+        // Dataset<Row> dataset =
+        // sparkSession.read().schema(getSchema()).format("com.bugdbug.customsource.csv.CSV").option("fileName",
+        // "/home/ubuntu/p/big-data-projects/Datasource spark3/src/test/resources/1000 Sales Records.csv").load();
+        Dataset<Row> dataset = sparkSession.read().schema(getSchema()).format("kite").option("fileName", filepath)
+                .load();
 
-	/* temp view */
-	/*
-	dataset.createOrReplaceTempView("bug");
-	//Dataset<Row> regionset = sparkSession.sql("select Item_Type, min(Unit_Price) as min_price, max(Total_Revenue) as max_revenue,  max(Total_Cost) as max_cost from bug group by Item_Type");
-	Dataset<Row> regionset = sparkSession.sql("select Item_Type, avg(Unit_Price) as avg_price, sum(Total_Cost) as sum_cost from bug where Units_Sold > 2 group by Item_Type");
-        regionset.show(false);
-	*/
+        /* temp view */
+        /*
+         * dataset.createOrReplaceTempView("bug"); //Dataset<Row> regionset = sparkSession.
+         * sql("select Item_Type, min(Unit_Price) as min_price, max(Total_Revenue) as max_revenue,  max(Total_Cost) as max_cost from bug group by Item_Type"
+         * ); Dataset<Row> regionset = sparkSession.
+         * sql("select Item_Type, avg(Unit_Price) as avg_price, sum(Total_Cost) as sum_cost from bug where Units_Sold > 2 group by Item_Type"
+         * ); regionset.show(false);
+         */
 
+        /* aggregate case. use aggregate.csv */
+        Map<String, String> aggr = new HashMap<String, String>() {
+            {
+                put("Unit_Price", "sum");
+                put("Total_Cost", "avg");
+            }
+        };
+        dataset.filter("Units_Sold > 2").groupBy("Item_Type").agg(aggr).show(false);
 
-	/* aggregate case. use aggregate.csv */
-	Map<String, String> aggr = new HashMap<String, String>(){{ put("Unit_Price", "sum"); put("Total_Cost", "avg");}};
-	dataset.filter("Units_Sold > 2").groupBy("Item_Type").agg(aggr).show(false);
+        /* required columns. use required.csv */
+        // dataset.select("Region", "Country" , "Item_Type", "Sales_Channel").filter("Sales_Channel =
+        // 'Online'").show(false);
 
+        /* all columns. use 1000....csv */
+        // dataset.filter("Sales_Channel = 'Online' or Unit_Price > 100").show(false);
 
-	/* required columns. use required.csv */
-	//dataset.select("Region", "Country" , "Item_Type", "Sales_Channel").filter("Sales_Channel = 'Online'").show(false);
+        byte[] b = new byte[32];
+        b[15] = 1;
+        b[31] = 2;
+        ByteBuffer bb = ByteBuffer.wrap(b);
+        BigDecimal dec1 = DecimalUtility.getBigDecimalFromByteBuffer(bb, 4, 16);
+        BigDecimal dec2 = DecimalUtility.getBigDecimalFromByteBuffer(bb, 4, 16);
 
-	/* all columns. use 1000....csv */
-	//dataset.filter("Sales_Channel = 'Online' or Unit_Price > 100").show(false);
-
-	byte[] b = new byte[32];
-	b[15] = 1;
-	b[31] = 2;
-	ByteBuffer bb = ByteBuffer.wrap(b);
-	BigDecimal dec1 = DecimalUtility.getBigDecimalFromByteBuffer(bb, 4, 16);
-	BigDecimal dec2 = DecimalUtility.getBigDecimalFromByteBuffer(bb, 4, 16);
-
-	System.out.println(dec1.toString() + " " + dec2.toString());
-
-
+        System.out.println(dec1.toString() + " " + dec2.toString());
 
     }
 
     private static StructType getSchema() {
-        StructField[] structFields = new StructField[]{
+        StructField[] structFields = new StructField[] {
                 new StructField("Region", DataTypes.StringType, true, Metadata.empty()),
                 new StructField("Country", DataTypes.StringType, true, Metadata.empty()),
                 new StructField("Item_Type", DataTypes.StringType, true, Metadata.empty()),
@@ -83,9 +86,7 @@ public class CsvDataSourceRunner {
                 new StructField("Unit_Cost", DataTypes.DoubleType, true, Metadata.empty()),
                 new StructField("Total_Revenue", DataTypes.DoubleType, true, Metadata.empty()),
                 new StructField("Total_Cost", DataTypes.DoubleType, true, Metadata.empty()),
-                new StructField("Total_Profit", DataTypes.DoubleType, true, Metadata.empty())
-        };
+                new StructField("Total_Profit", DataTypes.DoubleType, true, Metadata.empty()) };
         return new StructType(structFields);
     }
 }
-

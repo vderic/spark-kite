@@ -15,112 +15,109 @@ import java.math.BigInteger;
 
 public class XrgIterator {
 
-	Vector<XrgVector> vector;
-	int curr = 0;
-	int nitem = 0;
-	XrgVectorHeader[] attrs;
-	ByteBuffer[] data_array;
-	ByteBuffer[] flag_array;
+    Vector<XrgVector> vector;
+    int curr = 0;
+    int nitem = 0;
+    XrgVectorHeader[] attrs;
+    ByteBuffer[] data_array;
+    ByteBuffer[] flag_array;
 
-	Object[] values;
-	byte[] flags;
+    Object[] values;
+    byte[] flags;
 
-	public XrgIterator(Vector<XrgVector> vector) {
-		this.vector = vector;
+    public XrgIterator(Vector<XrgVector> vector) {
+        this.vector = vector;
 
-		int nvec = vector.size();
-		data_array = new ByteBuffer[nvec];
-		flag_array = new ByteBuffer[nvec];
+        int nvec = vector.size();
+        data_array = new ByteBuffer[nvec];
+        flag_array = new ByteBuffer[nvec];
 
-		attrs = new XrgVectorHeader[nvec];
-		for (int i = 0 ; i < nvec ; i++) {
-			XrgVector v = vector.elementAt(i);
-			attrs[i] = v.getHeader();
-			nitem = attrs[i].getNItem();
-			data_array[i] = v.getData().asReadOnlyBuffer();
-			flag_array[i] = v.getFlag().asReadOnlyBuffer();
-		}
+        attrs = new XrgVectorHeader[nvec];
+        for (int i = 0; i < nvec; i++) {
+            XrgVector v = vector.elementAt(i);
+            attrs[i] = v.getHeader();
+            nitem = attrs[i].getNItem();
+            data_array[i] = v.getData().asReadOnlyBuffer();
+            flag_array[i] = v.getFlag().asReadOnlyBuffer();
+        }
 
-		flags = new byte[nvec];
-		values = new Object[nvec];
-	}
+        flags = new byte[nvec];
+        values = new Object[nvec];
+    }
 
-	public boolean next() {
-		if (curr >= nitem) {
-			return false;
-		}
+    public boolean next() {
+        if (curr >= nitem) {
+            return false;
+        }
 
-		int nvec = vector.size();
-		for (int i = 0 ; i < nvec ; i++) {
-			short ptyp = attrs[i].getPhysicalType();
-			short ltyp = attrs[i].getLogicalType();
-			int scale = attrs[i].getScale();
-			int precision = attrs[i].getPrecision();
+        int nvec = vector.size();
+        for (int i = 0; i < nvec; i++) {
+            short ptyp = attrs[i].getPhysicalType();
+            short ltyp = attrs[i].getLogicalType();
+            int scale = attrs[i].getScale();
+            int precision = attrs[i].getPrecision();
 
-			ByteBuffer data = data_array[i];
-			ByteBuffer flag = flag_array[i];
+            ByteBuffer data = data_array[i];
+            ByteBuffer flag = flag_array[i];
 
-			flags[i] = flag.get();
+            flags[i] = flag.get();
 
-			switch (attrs[i].getPhysicalType()) {
-				case PhysicalTypes.INT8:
-					values[i] = new Byte(data.get());
-					break;
-				case PhysicalTypes.INT16:
-					values[i] = new Short(data.getShort());
-					break;
-				case PhysicalTypes.INT32:
-					values[i] = new Integer(data.getInt());
-					break;
-				case PhysicalTypes.INT64:
-					long int64 = data.getLong();
-					if (ltyp == LogicalTypes.DECIMAL) {
-						values[i] = new BigDecimal(int64).setScale(scale);
-					} else {
-						values[i] = new Long(int64);
-					}
-					break;
-				case PhysicalTypes.FP32:
-					values[i] = new Float(data.getFloat());
-					break;
-				case PhysicalTypes.FP64:
-					values[i] = new Double(data.getDouble());
-					break;
-				case PhysicalTypes.BYTEA:
-					{
-					int itemsz = data.getInt();
-					byte[] ba = new byte[itemsz];
-					data.get(ba);
-					values[i] = ba;
-					}
-					break;
-				case PhysicalTypes.INT128:
-				{
-					int itemsz = attrs[i].getItemSize();
-					byte[] ba = new byte[itemsz];
-					data.get(ba);
-					if (ltyp == LogicalTypes.DECIMAL) {
-						values[i] = DecimalUtility.getBigDecimalFromByteBuffer(ByteBuffer.wrap(ba), scale, itemsz);
-					} else {
-						values[i] = new BigInteger(ba);
-					}
-				}
-					break;
-			}
+            switch (attrs[i].getPhysicalType()) {
+            case PhysicalTypes.INT8:
+                values[i] = new Byte(data.get());
+                break;
+            case PhysicalTypes.INT16:
+                values[i] = new Short(data.getShort());
+                break;
+            case PhysicalTypes.INT32:
+                values[i] = new Integer(data.getInt());
+                break;
+            case PhysicalTypes.INT64:
+                long int64 = data.getLong();
+                if (ltyp == LogicalTypes.DECIMAL) {
+                    values[i] = new BigDecimal(int64).setScale(scale);
+                } else {
+                    values[i] = new Long(int64);
+                }
+                break;
+            case PhysicalTypes.FP32:
+                values[i] = new Float(data.getFloat());
+                break;
+            case PhysicalTypes.FP64:
+                values[i] = new Double(data.getDouble());
+                break;
+            case PhysicalTypes.BYTEA: {
+                int itemsz = data.getInt();
+                byte[] ba = new byte[itemsz];
+                data.get(ba);
+                values[i] = ba;
+            }
+                break;
+            case PhysicalTypes.INT128: {
+                int itemsz = attrs[i].getItemSize();
+                byte[] ba = new byte[itemsz];
+                data.get(ba);
+                if (ltyp == LogicalTypes.DECIMAL) {
+                    values[i] = DecimalUtility.getBigDecimalFromByteBuffer(ByteBuffer.wrap(ba), scale, itemsz);
+                } else {
+                    values[i] = new BigInteger(ba);
+                }
+            }
+                break;
+            }
 
-		}
-			
-		curr++;
-		return true;
-	}
+        }
 
-	public Object[] getValues() {
-		return values;
-	}
+        curr++;
+        return true;
+    }
 
-	public byte[] getFlags() {
-		return flags;
-	}
+    public Object[] getValues() {
+        return values;
+    }
 
+    public byte[] getFlags() {
+        return flags;
+    }
 
 }

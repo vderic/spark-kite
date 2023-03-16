@@ -25,10 +25,8 @@ public class KitePartitionReader implements PartitionReader<InternalRow> {
     private CSVReader csvReader;
     private List<Function> valueConverters;
 
-    public KitePartitionReader(
-            KiteInputPartition csvInputPartition,
-            StructType schema,
-            String fileName) throws FileNotFoundException, URISyntaxException {
+    public KitePartitionReader(KiteInputPartition csvInputPartition, StructType schema, String fileName)
+            throws FileNotFoundException, URISyntaxException {
         this.csvInputPartition = csvInputPartition;
         this.fileName = fileName;
         this.valueConverters = ValueConverters.getConverters(schema);
@@ -37,14 +35,14 @@ public class KitePartitionReader implements PartitionReader<InternalRow> {
 
     private void createCsvReader() throws URISyntaxException, FileNotFoundException {
         FileReader filereader;
-        //URL resource = this.getClass().getClassLoader().getResource(this.fileName);
-        //filereader = new FileReader(new File(resource.toURI()));
+        // URL resource = this.getClass().getClassLoader().getResource(this.fileName);
+        // filereader = new FileReader(new File(resource.toURI()));
         filereader = new FileReader(new File(this.fileName));
         csvReader = new CSVReader(filereader);
         iterator = csvReader.iterator();
         iterator.next();
-	Integer[] fragid = csvInputPartition.getFragId();
-	System.err.println("CreateCSvReader: fragid=" + fragid[0] + ", fragcnt = " + fragid[1]);
+        Integer[] fragid = csvInputPartition.getFragId();
+        System.err.println("CreateCSvReader: fragid=" + fragid[0] + ", fragcnt = " + fragid[1]);
 
     }
 
@@ -60,7 +58,8 @@ public class KitePartitionReader implements PartitionReader<InternalRow> {
         for (int i = 0; i < values.length; i++) {
             convertedValues[i] = valueConverters.get(i).apply(values[i]);
         }
-        return InternalRow.apply(JavaConverters.asScalaIteratorConverter(Arrays.asList(convertedValues).iterator()).asScala().toSeq());
+        return InternalRow.apply(
+                JavaConverters.asScalaIteratorConverter(Arrays.asList(convertedValues).iterator()).asScala().toSeq());
     }
 
     @Override

@@ -17,35 +17,32 @@ public class KiteScan implements Scan {
     private final CaseInsensitiveStringMap options;
     private Aggregation aggregation = null;
 
-    public KiteScan(StructType schema,
-                   Map<String, String> properties,
-                   CaseInsensitiveStringMap options,
-		   Aggregation aggregation) {
+    public KiteScan(StructType schema, Map<String, String> properties, CaseInsensitiveStringMap options,
+            Aggregation aggregation) {
 
         this.schema = schema;
         this.properties = properties;
         this.options = options;
-	this.aggregation = aggregation;
+        this.aggregation = aggregation;
     }
 
     @Override
     public StructType readSchema() {
-        //return schema;
+        // return schema;
 
-	if (aggregation != null) {
-	/* aggregate */
-	StructField[] structFields = new StructField[]{
-                new StructField("Item_Type", DataTypes.StringType, true, Metadata.empty()),
-                new StructField("SUM(Total_Cost)", DataTypes.DoubleType, true, Metadata.empty()),
-                new StructField("COUNT(Total_Cost)", DataTypes.IntegerType, true, Metadata.empty()),
-                new StructField("SUM(Unit_Price)", DataTypes.DoubleType, true, Metadata.empty())
-         };
+        if (aggregation != null) {
+            /* aggregate */
+            StructField[] structFields = new StructField[] {
+                    new StructField("Item_Type", DataTypes.StringType, true, Metadata.empty()),
+                    new StructField("SUM(Total_Cost)", DataTypes.DoubleType, true, Metadata.empty()),
+                    new StructField("COUNT(Total_Cost)", DataTypes.IntegerType, true, Metadata.empty()),
+                    new StructField("SUM(Unit_Price)", DataTypes.DoubleType, true, Metadata.empty()) };
 
-	schema = new StructType(structFields);
-	}
+            schema = new StructType(structFields);
+        }
 
-	System.out.println(schema.toString());
-	return schema;
+        System.out.println(schema.toString());
+        return schema;
     }
 
     @Override
@@ -55,6 +52,6 @@ public class KiteScan implements Scan {
 
     @Override
     public Batch toBatch() {
-        return new KiteBatch(schema,properties,options);
+        return new KiteBatch(schema, properties, options);
     }
 }

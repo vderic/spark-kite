@@ -13,12 +13,13 @@ public class KiteTableProvider implements TableProvider, DataSourceRegister {
     public KiteTableProvider() {
 
     }
+
     public StructType inferSchema(CaseInsensitiveStringMap options) {
         return null;
     }
 
     public Table getTable(StructType schema, Transform[] partitioning, Map<String, String> properties) {
-        return new KiteTable(schema,properties);
+        return new KiteTable(schema, properties);
     }
 
     @Override
@@ -27,6 +28,6 @@ public class KiteTableProvider implements TableProvider, DataSourceRegister {
     }
 
     public String shortName() {
-	    return "kite";
+        return "kite";
     }
 }

@@ -13,9 +13,8 @@ public class KiteBatch implements Batch {
     private final Map<String, String> properties;
     private final CaseInsensitiveStringMap options;
     private final String filename;
-    public KiteBatch(StructType schema,
-                    Map<String, String> properties,
-                    CaseInsensitiveStringMap options) {
+
+    public KiteBatch(StructType schema, Map<String, String> properties, CaseInsensitiveStringMap options) {
 
         this.schema = schema;
         this.properties = properties;
@@ -25,12 +24,12 @@ public class KiteBatch implements Batch {
 
     @Override
     public InputPartition[] planInputPartitions() {
-	int npart = 3;
-	InputPartition[] partitions = new KiteInputPartition[npart];
-	for (int i = 0 ; i < npart ; i++) {
-		Integer[] fragid = new Integer[]{i, npart};
-		partitions[i] = new KiteInputPartition(fragid, "localhost");
-	}
+        int npart = 3;
+        InputPartition[] partitions = new KiteInputPartition[npart];
+        for (int i = 0; i < npart; i++) {
+            Integer[] fragid = new Integer[] { i, npart };
+            partitions[i] = new KiteInputPartition(fragid, "localhost");
+        }
         return partitions;
     }
 

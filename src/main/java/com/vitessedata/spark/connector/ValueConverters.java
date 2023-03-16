@@ -26,7 +26,6 @@ public class ValueConverters {
         return valueConverters;
     }
 
-
     public static Function<String, UTF8String> UTF8StringConverter = UTF8String::fromString;
     public static Function<String, Double> DoubleConverter = value -> value == null ? null : Double.parseDouble(value);
     public static Function<String, Integer> IntConverter = value -> value == null ? null : Integer.parseInt(value);
