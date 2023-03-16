@@ -24,7 +24,7 @@ public class XrgVector {
 		int zbyte = header.getZByte();
 		int nitem = header.getNItem();
 
-		if (nbyte != zbyte) {
+		if (isCompressed()) {
 			// decompress the data
 			ByteBuffer zbuf = ByteBuffer.wrap(buf, XrgVectorHeader.HEADER_SIZE, zbyte);
 
@@ -42,6 +42,10 @@ public class XrgVector {
 		}
 		flag = ByteBuffer.wrap(buf, XrgVectorHeader.HEADER_SIZE + zbyte, nitem);
 
+	}
+
+	public boolean isCompressed() {
+		return (header.getZByte() != header.getNByte());
 	}
 
 	public XrgVectorHeader getHeader() {

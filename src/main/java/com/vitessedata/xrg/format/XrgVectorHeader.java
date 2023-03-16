@@ -25,7 +25,7 @@ public class XrgVectorHeader {
 
 	}
 
-	public short getPhyscialType(){
+	public short getPhysicalType(){
 		return ptyp;
 	}
 	public void setPhysicalType(short ptyp) {
