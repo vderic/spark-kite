@@ -45,12 +45,13 @@ public class CsvDataSourceRunner {
          */
 
         /* aggregate case. use aggregate.csv */
-        Map<String, String> aggr = new HashMap<String, String>() {
-            {
-                put("Unit_Price", "sum");
-                put("Total_Cost", "avg");
-            }
-        };
+        /*
+         * java 8 Map<String, String> aggr = new HashMap<String, String>() { { put("Unit_Price", "sum");
+         * put("Total_Cost", "avg"); } };
+         */
+
+        Map<String, String> aggr = Map.of("Unit_Price", "sum", "Total_Cost", "avg");
+
         dataset.filter("Units_Sold > 2").groupBy("Item_Type").agg(aggr).show(false);
 
         /* required columns. use required.csv */
