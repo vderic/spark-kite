@@ -3,7 +3,8 @@ package com.vitessedata.xrg.format;
 import java.nio.ByteBuffer;
 import java.io.IOException;
 import java.io.ByteArrayInputStream;
-import java.util.zip.GZIPInputStream;
+import net.jpountz.lz4.LZ4Factory;
+import net.jpountz.lz4.LZ4FastDecompressor;
 
 public class XrgVector {
 
@@ -26,18 +27,12 @@ public class XrgVector {
 
         if (isCompressed()) {
             // decompress the data
+            LZ4Factory factory = LZ4Factory.fastestInstance();
             ByteBuffer zbuf = ByteBuffer.wrap(buf, XrgVectorHeader.HEADER_SIZE, zbyte);
 
-            try (GZIPInputStream gzis = new GZIPInputStream(
-                    new ByteArrayInputStream(buf, XrgVectorHeader.HEADER_SIZE, zbyte))) {
-                byte[] d = new byte[nbyte];
-                int len = gzis.read(d, 0, nbyte);
-                if (len != nbyte) {
-                    throw new IOException("compressed data length not match");
-                }
-
-                data = ByteBuffer.wrap(d);
-            }
+            LZ4FastDecompressor decompressor = factory.fastDecompressor();
+            ByteBuffer data = ByteBuffer.allocate(nbyte);
+            decompressor.decompress(zbuf, data);
         } else {
             data = ByteBuffer.wrap(buf, XrgVectorHeader.HEADER_SIZE, nbyte);
         }
