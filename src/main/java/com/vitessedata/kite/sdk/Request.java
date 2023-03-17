@@ -26,7 +26,7 @@ public class Request {
 
         json.put("schema", schema);
         json.put("sql", sql);
-        json.put("frag", new JSONArray().put(fragid).put(fragcnt));
+        json.put("fragment", new JSONArray().put(fragid).put(fragcnt));
 
         if (filespec instanceof CsvFileSpec) {
             CsvFileSpec csv = (CsvFileSpec) filespec;

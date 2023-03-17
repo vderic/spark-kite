@@ -24,7 +24,17 @@ public class KiteClient {
      */
     public void submit(String addr, Request request) throws IOException {
 
+        if (!addr.contains(":")) {
+            throw new IllegalArgumentException("addr should be host:port");
+        }
+        String[] addrport = addr.split(":", 2);
+
+        Socket socket = new Socket(addrport[0], Integer.parseInt(addrport[1]));
+        sockstream = new SockStream(socket);
+
         String json = request.toString();
+        sockstream.send(KiteMessage.JSON, json.getBytes());
+
     }
 
     public XrgIterator next() throws IOException {
