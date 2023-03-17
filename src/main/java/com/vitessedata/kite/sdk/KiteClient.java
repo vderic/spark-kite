@@ -23,18 +23,19 @@ public class KiteClient {
 
     public XrgIterator next() throws IOException {
 
-        if (iter == null) {
-            Vector<XrgVector> pages = readXrgVector();
-            if (pages == null) {
-                return null;
+        for (;;) {
+            if (iter == null) {
+                Vector<XrgVector> pages = readXrgVector();
+                if (pages == null || pages.size() == 0) {
+                    return null;
+                }
+                iter = new XrgIterator(pages);
             }
-            iter = new XrgIterator(pages);
+            if (iter.next()) {
+                return iter;
+            }
+            iter = null;
         }
-        if (iter.next() == false) {
-            return null;
-        }
-
-        return iter;
     }
 
     public void release() throws IOException {
@@ -42,24 +43,30 @@ public class KiteClient {
     }
 
     private Vector<XrgVector> readXrgVector() throws IOException {
-        int ncol = 0;
         Vector<XrgVector> pages = new Vector<XrgVector>();
-        KiteMessage msg = sockstream.recv();
 
-        byte[] msgty = msg.getMessageType();
-        if (Arrays.equals(msgty, KiteMessage.ERROR)) {
+        while (true) {
+            KiteMessage msg = sockstream.recv();
 
-        } else if (Arrays.equals(msgty, KiteMessage.VECTOR)) {
+            byte[] msgty = msg.getMessageType();
+            if (Arrays.equals(msgty, KiteMessage.ERROR)) {
+                throw new IOException(new String(msg.getMessageBuffer()));
 
-            int len = msg.getMessageLength();
-            if (len == 0) {
-                return null;
+            } else if (Arrays.equals(msgty, KiteMessage.VECTOR)) {
+
+                int len = msg.getMessageLength();
+                if (len == 0) {
+                    break;
+                } else {
+                    XrgVector v = new XrgVector(msg.getMessageBuffer());
+                    pages.addElement(v);
+                }
+            } else if (Arrays.equals(msgty, KiteMessage.BYE)) {
+                release();
+                break;
             } else {
-                XrgVector v = new XrgVector(msg.getMessageBuffer());
-                pages.addElement(v);
-                ncol++;
+                throw new IOException("Invalid Kite message type");
             }
-        } else {
 
         }
 
