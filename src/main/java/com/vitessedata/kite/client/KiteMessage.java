@@ -34,7 +34,7 @@ public class KiteMessage {
     }
 
     /* will set the message length and realloc buffer */
-    public byte[] setMessage(byte[] msgty, int bufsz) {
+    public byte[] allocateMessage(byte[] msgty, int bufsz) {
         System.arraycopy(msgty, 0, this.msgty, 0, this.msgty.length);
         msglen = bufsz;
 

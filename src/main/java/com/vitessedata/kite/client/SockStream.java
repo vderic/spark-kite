@@ -66,7 +66,7 @@ public class SockStream {
 
         int msglen = Integer.parseInt(new String(hex), 16);
 
-        byte[] buf = msg.setMessage(msgty, msglen);
+        byte[] buf = msg.allocateMessage(msgty, msglen);
         readfully(buf, msglen);
 
     }
