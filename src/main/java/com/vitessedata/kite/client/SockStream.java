@@ -17,6 +17,8 @@ public class SockStream {
     }
 
     public void close() throws IOException {
+        in.close();
+        out.close();
         socket.close();
     }
 
