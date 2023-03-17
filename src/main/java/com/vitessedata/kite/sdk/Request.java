@@ -30,7 +30,11 @@ public class Request {
 
         if (filespec instanceof CsvFileSpec) {
             CsvFileSpec csv = (CsvFileSpec) filespec;
-            System.out.println(csv.fmt + csv.delim + csv.nullstr);
+            json.put("fmt", csv.fmt);
+            json.put("csvspec",
+                    new JSONObject().put("delim", String.valueOf(csv.delim)).put("quote", String.valueOf(csv.quote))
+                            .put("escape", String.valueOf(csv.escape))
+                            .put("header_line", String.valueOf(csv.header_line)).put("nullstr", csv.nullstr));
         }
 
     }
@@ -41,7 +45,7 @@ public class Request {
 
     public static void main(String[] args) {
 
-        Request req = new Request("schema", "sql", 0, 1, null);
+        Request req = new Request("schema", "sql", 0, 1, new CsvFileSpec(',', '"', '"', false, "NULL"));
         System.out.println(req.toString());
     }
 
