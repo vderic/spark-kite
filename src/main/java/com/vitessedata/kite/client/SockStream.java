@@ -53,7 +53,7 @@ public class SockStream {
         out.write(msg);
     }
 
-    public void recv(KiteMessage msg) throws IOException {
+    public KiteMessage recv() throws IOException {
 
         ByteBuffer meta = ByteBuffer.allocate(12);
         readfully(meta.array(), meta.array().length);
@@ -66,9 +66,11 @@ public class SockStream {
 
         int msglen = Integer.parseInt(new String(hex), 16);
 
-        byte[] buf = msg.allocateMessage(msgty, msglen);
+        KiteMessage msg = new KiteMessage(msgty, msglen);
+        byte[] buf = msg.getMessageBuffer();
         readfully(buf, msglen);
 
+        return msg;
     }
 
 }

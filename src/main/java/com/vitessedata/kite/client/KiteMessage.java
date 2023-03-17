@@ -14,10 +14,11 @@ public class KiteMessage {
     private int msglen = 0;
     private byte[] msgty = null;
 
-    public KiteMessage() {
-        msgty = new byte[4];
-        buffer = new byte[1024];
-        msglen = 0;
+    public KiteMessage(byte[] msgty, int msglen) {
+        this.msgty = new byte[4];
+        System.arraycopy(msgty, 0, this.msgty, 0, this.msgty.length);
+        buffer = new byte[msglen];
+        this.msglen = msglen;
 
     }
 
@@ -29,22 +30,7 @@ public class KiteMessage {
         return msglen;
     }
 
-    public byte[] getMessage() {
+    public byte[] getMessageBuffer() {
         return buffer;
     }
-
-    /* will set the message length and realloc buffer */
-    public byte[] allocateMessage(byte[] msgty, int bufsz) {
-        System.arraycopy(msgty, 0, this.msgty, 0, this.msgty.length);
-        msglen = bufsz;
-
-        // realloc buffer
-        if (buffer.length < bufsz) {
-            buffer = new byte[bufsz];
-            return buffer;
-        }
-
-        return buffer;
-    }
-
 }
