@@ -13,12 +13,18 @@ public class KiteClient {
     private XrgIterator iter;
 
     public KiteClient() {
+        sockstream = null;
         iter = null;
 
     }
 
-    public void submit() throws IOException {
+    /*
+     * submit a SQL query to kite. addr: host:port schema: lines of "name:type:precision:scale" fragid: a number between
+     * 0 and fragnct-1 fragcnt: max number of fragments
+     */
+    public void submit(String addr, Request request) throws IOException {
 
+        String json = request.toString();
     }
 
     public XrgIterator next() throws IOException {
