@@ -52,16 +52,21 @@ public class KiteConnection {
         return this;
     }
 
+    public KiteConnection request(Request request) {
+        req = request;
+        return this;
+    }
+
     /*
      * submit a SQL query to kite. addr: host:port schema: lines of "name:type:precision:scale" fragid: a number between
      * 0 and fragnct-1 fragcnt: max number of fragments
      */
-    public void submit(String addr, Request request) throws IOException {
+    public void submit() throws IOException {
 
         Socket socket = new Socket(host, port);
         sockstream = new SockStream(socket);
 
-        String json = request.toString();
+        String json = req.toJSON().toString();
         sockstream.send(KiteMessage.JSON, json.getBytes());
 
     }
