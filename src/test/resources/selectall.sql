@@ -1,1 +1,1 @@
-select * from "test_tpch/csv/lineitem*" limit 10
+select * from "test_tpch/csv/lineitem*"  where l_orderkey = 1; 

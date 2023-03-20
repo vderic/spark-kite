@@ -14,6 +14,7 @@ import java.nio.ByteOrder;
 import org.apache.arrow.vector.util.DecimalUtility;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Date;
 
 public class XrgIterator {
 
@@ -75,7 +76,13 @@ public class XrgIterator {
                 values[i] = new Short(data.getShort());
                 break;
             case PhysicalTypes.INT32:
-                values[i] = new Integer(data.getInt());
+                if (ltyp == LogicalTypes.DATE) {
+                    long offset = 24L * 3600L * 1000L;
+                    long datetime = data.getInt() * offset;
+                    values[i] = new java.sql.Date(datetime);
+                } else {
+                    values[i] = new Integer(data.getInt());
+                }
                 break;
             case PhysicalTypes.INT64:
                 long int64 = data.getLong();
