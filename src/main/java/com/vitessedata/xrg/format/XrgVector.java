@@ -27,7 +27,6 @@ public class XrgVector {
         int zbyte = header.getZByte();
         int nitem = header.getNItem();
 
-        System.out.println(header);
         if (isCompressed()) {
             // decompress the data
             LZ4Factory factory = LZ4Factory.fastestInstance();
