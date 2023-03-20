@@ -158,6 +158,12 @@ public class XrgVectorHeader {
         sb.append("ltyp =");
         sb.append(ltyp);
         sb.append(",");
+        sb.append("precision=");
+        sb.append(precision);
+        sb.append(",");
+        sb.append("scale=");
+        sb.append(scale);
+        sb.append(",");
         sb.append("nbyte=");
         sb.append(nbyte);
         sb.append(",");

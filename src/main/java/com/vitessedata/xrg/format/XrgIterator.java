@@ -9,6 +9,7 @@ import java.lang.Float;
 import java.lang.Short;
 import java.util.Vector;
 import java.nio.ByteBuffer;
+import java.nio.LongBuffer;
 import java.nio.ByteOrder;
 import org.apache.arrow.vector.util.DecimalUtility;
 import java.math.BigDecimal;
@@ -79,7 +80,7 @@ public class XrgIterator {
             case PhysicalTypes.INT64:
                 long int64 = data.getLong();
                 if (ltyp == LogicalTypes.DECIMAL) {
-                    values[i] = new BigDecimal(int64).setScale(scale);
+                    values[i] = new BigDecimal(int64).movePointLeft(scale);
                 } else {
                     values[i] = new Long(int64);
                 }
@@ -104,10 +105,22 @@ public class XrgIterator {
             case PhysicalTypes.INT128: {
                 byte[] ba = new byte[itemsz];
                 data.get(ba);
+                /*
+                 * xrg return array of int64 (little endian) [low, high] but BigDecimal requires [high, low] in Big
+                 * endian
+                 */
+                ByteBuffer bb = ByteBuffer.wrap(ba);
+                bb.order(ByteOrder.LITTLE_ENDIAN);
+                long low = bb.getLong();
+                long high = bb.getLong();
+                bb.order(ByteOrder.BIG_ENDIAN);
+                bb.rewind();
+                bb.putLong(high);
+                bb.putLong(low);
                 if (ltyp == LogicalTypes.DECIMAL) {
-                    values[i] = DecimalUtility.getBigDecimalFromByteBuffer(ByteBuffer.wrap(ba), scale, itemsz);
+                    values[i] = new BigDecimal(new BigInteger(bb.array()), scale);
                 } else {
-                    values[i] = new BigInteger(ba);
+                    values[i] = new BigInteger(bb.array());
                 }
             }
                 break;
