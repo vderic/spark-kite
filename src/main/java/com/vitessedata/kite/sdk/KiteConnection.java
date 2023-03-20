@@ -7,15 +7,49 @@ import java.util.Vector;
 import com.vitessedata.kite.client.*;
 import com.vitessedata.xrg.format.*;
 
-public class KiteClient {
+public class KiteConnection {
 
     private SockStream sockstream;
     private XrgIterator iter;
+    private Request req;
+    private String host;
+    private int port;
 
-    public KiteClient() {
+    public KiteConnection() {
         sockstream = null;
         iter = null;
+        req = new Request();
 
+    }
+
+    public KiteConnection host(String addr) {
+        if (!addr.contains(":")) {
+            throw new IllegalArgumentException("addr should be host:port");
+        }
+        String[] addrport = addr.split(":", 2);
+        host = addrport[0];
+        port = Integer.parseInt(addrport[1]);
+        return this;
+    }
+
+    public KiteConnection schema(String schema) {
+        req.schema(schema);
+        return this;
+    }
+
+    public KiteConnection fragment(int fragid, int fragcnt) {
+        req.fragment(fragid, fragcnt);
+        return this;
+    }
+
+    public KiteConnection sql(String sql) {
+        req.sql(sql);
+        return this;
+    }
+
+    public KiteConnection format(FileSpec filespec) {
+        req.format(filespec);
+        return this;
     }
 
     /*
@@ -24,12 +58,7 @@ public class KiteClient {
      */
     public void submit(String addr, Request request) throws IOException {
 
-        if (!addr.contains(":")) {
-            throw new IllegalArgumentException("addr should be host:port");
-        }
-        String[] addrport = addr.split(":", 2);
-
-        Socket socket = new Socket(addrport[0], Integer.parseInt(addrport[1]));
+        Socket socket = new Socket(host, port);
         sockstream = new SockStream(socket);
 
         String json = request.toString();

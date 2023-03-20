@@ -9,7 +9,10 @@ public class Request {
     private int fragid;
     private int fragcnt;
     private FileSpec filespec;
-    private JSONObject json;
+
+    public Request() {
+
+    }
 
     public Request(String schema, String sql, int fragid, int fragcnt, FileSpec filespec) {
         this.schema = schema;
@@ -17,22 +20,27 @@ public class Request {
         this.fragid = fragid;
         this.fragcnt = fragcnt;
         this.filespec = filespec;
+    }
 
-        json = new JSONObject();
+    public Request schema(String schema) {
+        this.schema = schema;
+        return this;
+    }
 
-        json.put("schema", schema2JSON(schema));
-        json.put("sql", sql);
-        json.put("fragment", new JSONArray().put(fragid).put(fragcnt));
+    public Request fragment(int fragid, int fragcnt) {
+        this.fragid = fragid;
+        this.fragcnt = this.fragcnt;
+        return this;
+    }
 
-        if (filespec instanceof CsvFileSpec) {
-            CsvFileSpec csv = (CsvFileSpec) filespec;
-            json.put("fmt", csv.fmt);
-            json.put("csvspec",
-                    new JSONObject().put("delim", String.valueOf(csv.delim)).put("quote", String.valueOf(csv.quote))
-                            .put("escape", String.valueOf(csv.escape))
-                            .put("header_line", String.valueOf(csv.header_line)).put("nullstr", csv.nullstr));
-        }
+    public Request format(FileSpec filespec) {
+        this.filespec = filespec;
+        return this;
+    }
 
+    public Request sql(String sql) {
+        this.sql = sql;
+        return this;
     }
 
     private JSONArray schema2JSON(String schema) {
@@ -49,16 +57,35 @@ public class Request {
         return array;
     }
 
-    public String toString() {
-        return json.toString();
+    public JSONObject toJSON() {
+        JSONObject json = new JSONObject();
+
+        json.put("schema", schema2JSON(schema));
+        json.put("sql", sql);
+        json.put("fragment", new JSONArray().put(fragid).put(fragcnt));
+
+        if (filespec instanceof CsvFileSpec) {
+            CsvFileSpec csv = (CsvFileSpec) filespec;
+            json.put("fmt", csv.fmt);
+            json.put("csvspec",
+                    new JSONObject().put("delim", String.valueOf(csv.delim)).put("quote", String.valueOf(csv.quote))
+                            .put("escape", String.valueOf(csv.escape))
+                            .put("header_line", String.valueOf(csv.header_line)).put("nullstr", csv.nullstr));
+        } else if (filespec instanceof ParquetFileSpec) {
+            ParquetFileSpec par = (ParquetFileSpec) filespec;
+            json.put("fmt", par.fmt);
+        }
+        return json;
     }
 
     public static void main(String[] args) {
 
         String schema = "orderid:int64:0:0\ncost:fp64:0:0\ntotal:decimal:28:3";
         String sql = "select * from lineitem*";
-        Request req = new Request(schema, sql, 0, 1, new CsvFileSpec(',', '"', '"', false, "NULL"));
-        System.out.println(req.toString());
+        Request req = new Request().schema(schema).sql(sql).fragment(0, 1)
+                .format(new CsvFileSpec(',', '"', '"', false, "NULL"));
+
+        System.out.println(req.toJSON().toString());
     }
 
 }
