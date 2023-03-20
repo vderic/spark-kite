@@ -83,7 +83,8 @@ public class Request {
         String schema = "orderid:int64:0:0\ncost:fp64:0:0\ntotal:decimal:28:3";
         String sql = "select * from lineitem*";
         Request req = new Request().schema(schema).sql(sql).fragment(0, 1)
-                .format(new CsvFileSpec(',', '"', '"', false, "NULL"));
+                .format(new CsvFileSpec().nullstr("NULL").delim(':'));
+        // .format(new CsvFileSpec(',', '"', '"', false, "NULL"));
 
         System.out.println(req.toJSON().toString());
     }
