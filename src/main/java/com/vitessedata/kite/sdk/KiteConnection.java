@@ -63,6 +63,10 @@ public class KiteConnection {
      */
     public void submit() throws IOException {
 
+        if (host == null) {
+            throw new RuntimeException("host not defined yet");
+        }
+
         Socket socket = new Socket(host, port);
         sockstream = new SockStream(socket);
 

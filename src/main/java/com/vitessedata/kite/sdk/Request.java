@@ -58,6 +58,22 @@ public class Request {
     }
 
     public JSONObject toJSON() {
+        if (schema == null) {
+            throw new RuntimeException("schema not defined yet");
+        }
+
+        if (fragcnt == 0 || fragid >= fragcnt) {
+            throw new RuntimeException("fragment not defined yet");
+        }
+
+        if (sql == null) {
+            throw new RuntimeException("sql not defined yet");
+        }
+
+        if (filespec == null) {
+            throw new RuntimeException("file format not defined yet");
+        }
+
         JSONObject json = new JSONObject();
 
         json.put("schema", schema2JSON(schema));
