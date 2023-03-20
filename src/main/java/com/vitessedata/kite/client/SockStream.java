@@ -41,18 +41,20 @@ public class SockStream {
 
     public void send(byte[] msgty, byte[] msg) throws IOException {
 
-        if (msg == null) {
-            throw new IOException("SockStream send(): msg cannot be NULL");
+        int msgsz = 0;
+        if (msg != null) {
+            msgsz = msg.length;
         }
 
-        int msgsz = msg.length;
         String hex = String.format("%08X", msgsz);
         ByteBuffer meta = ByteBuffer.allocate(12);
         meta.put(msgty);
         meta.put(hex.getBytes());
 
         out.write(meta.array());
-        out.write(msg);
+        if (msg != null && msg.length > 0) {
+            out.write(msg);
+        }
     }
 
     public KiteMessage recv() throws IOException {

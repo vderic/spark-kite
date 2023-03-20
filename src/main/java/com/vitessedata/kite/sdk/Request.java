@@ -29,7 +29,7 @@ public class Request {
 
     public Request fragment(int fragid, int fragcnt) {
         this.fragid = fragid;
-        this.fragcnt = this.fragcnt;
+        this.fragcnt = fragcnt;
         return this;
     }
 
@@ -50,8 +50,12 @@ public class Request {
 
         for (int i = 0; i < lines.length; i++) {
             String[] column = lines[i].split(":", 4);
-            array.put(new JSONObject().put("name", column[0]).put("type", column[1])
-                    .put("precision", Integer.parseInt(column[2])).put("scale", Integer.parseInt(column[3])));
+            if (column[1].equalsIgnoreCase("decimal")) {
+                array.put(new JSONObject().put("name", column[0]).put("type", column[1])
+                        .put("precision", Integer.parseInt(column[2])).put("scale", Integer.parseInt(column[3])));
+            } else {
+                array.put(new JSONObject().put("name", column[0]).put("type", column[1]));
+            }
         }
 
         return array;
@@ -63,7 +67,7 @@ public class Request {
         }
 
         if (fragcnt == 0 || fragid >= fragcnt) {
-            throw new RuntimeException("fragment not defined yet");
+            throw new RuntimeException("fragment not defined yet. (" + fragid + "," + fragcnt + ")");
         }
 
         if (sql == null) {
@@ -82,14 +86,18 @@ public class Request {
 
         if (filespec instanceof CsvFileSpec) {
             CsvFileSpec csv = (CsvFileSpec) filespec;
-            json.put("fmt", csv.fmt);
-            json.put("csvspec",
+            JSONObject spec = new JSONObject();
+            spec.put("fmt", csv.fmt);
+            spec.put("csvspec",
                     new JSONObject().put("delim", String.valueOf(csv.delim)).put("quote", String.valueOf(csv.quote))
                             .put("escape", String.valueOf(csv.escape))
                             .put("header_line", String.valueOf(csv.header_line)).put("nullstr", csv.nullstr));
+            json.put("filespec", spec);
         } else if (filespec instanceof ParquetFileSpec) {
             ParquetFileSpec par = (ParquetFileSpec) filespec;
-            json.put("fmt", par.fmt);
+            JSONObject spec = new JSONObject();
+            spec.put("fmt", par.fmt);
+            json.put("filespec", spec);
         }
         return json;
     }
