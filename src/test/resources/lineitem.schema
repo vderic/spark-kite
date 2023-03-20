@@ -1,0 +1,18 @@
+	[
+	    {"name":"l_orderkey", "type":"int64"},
+	    {"name":"l_partkey", "type":"int64"},
+	    {"name":"l_suppkey", "type":"int64"},
+	    {"name":"l_lineitem", "type":"int64"},
+	    {"name":"l_quantity", "type":"fp64"},
+	    {"name":"l_extendedprice", "type":"fp64"},
+	    {"name":"l_discount", "type":"fp64"},
+	    {"name":"l_tax", "type":"fp64"},
+	    {"name":"l_returnflag", "type":"string"},
+	    {"name":"l_linestatus", "type":"string"},
+	    {"name":"l_shipdate", "type":"date"},
+	    {"name":"l_commitdate", "type":"date"},
+	    {"name":"l_receiptdate", "type":"date"},
+	    {"name":"l_shipinstruct", "type":"string"},
+	    {"name":"l_shipmode", "type":"string"},
+	    {"name":"l_comment", "type":"string"}
+	]
