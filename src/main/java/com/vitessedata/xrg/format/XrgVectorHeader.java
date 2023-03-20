@@ -4,9 +4,10 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.nio.ByteBuffer;
 import java.lang.RuntimeException;
+import java.lang.StringBuffer;
 
 public class XrgVectorHeader {
-    public static final int HEADER_SIZE = 46;
+    public static final int HEADER_SIZE = 48;
     private static final byte[] XRG_MAGIC = { 'X', 'R', 'G', '1' };
 
     private short ptyp = 0;
@@ -120,7 +121,7 @@ public class XrgVectorHeader {
             throw new RuntimeException("Wrong Magic");
         }
 
-        // read 46 bytes header
+        // read 48 bytes header
         short ptyp = from.getShort();
         short ltyp = from.getShort();
         short fieldidx = from.getShort();
@@ -148,4 +149,27 @@ public class XrgVectorHeader {
         vechdr.setNInval(ninval);
         return vechdr;
     }
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("ptyp =");
+        sb.append(ptyp);
+        sb.append(",");
+        sb.append("ltyp =");
+        sb.append(ltyp);
+        sb.append(",");
+        sb.append("nbyte=");
+        sb.append(nbyte);
+        sb.append(",");
+        sb.append("zbyte=");
+        sb.append(zbyte);
+        sb.append(",");
+        sb.append("nitem=");
+        sb.append(nitem);
+        sb.append(",");
+        sb.append("itemsz=");
+        sb.append(itemsz);
+        return sb.toString();
+    }
+
 }

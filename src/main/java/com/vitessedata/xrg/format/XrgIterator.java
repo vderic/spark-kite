@@ -9,6 +9,7 @@ import java.lang.Float;
 import java.lang.Short;
 import java.util.Vector;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import org.apache.arrow.vector.util.DecimalUtility;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -38,7 +39,9 @@ public class XrgIterator {
             attrs[i] = v.getHeader();
             nitem = attrs[i].getNItem();
             data_array[i] = v.getData().asReadOnlyBuffer();
+            data_array[i].order(ByteOrder.LITTLE_ENDIAN);
             flag_array[i] = v.getFlag().asReadOnlyBuffer();
+            flag_array[i].order(ByteOrder.LITTLE_ENDIAN);
         }
 
         flags = new byte[nvec];

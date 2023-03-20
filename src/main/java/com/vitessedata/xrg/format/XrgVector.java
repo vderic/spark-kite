@@ -1,6 +1,7 @@
 package com.vitessedata.xrg.format;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.io.IOException;
 import java.io.ByteArrayInputStream;
 import net.jpountz.lz4.LZ4Factory;
@@ -20,6 +21,7 @@ public class XrgVector {
     private void init(byte[] buf) {
         buffer = buf;
         ByteBuffer headerbuf = ByteBuffer.wrap(buf, 0, XrgVectorHeader.HEADER_SIZE);
+        headerbuf.order(ByteOrder.LITTLE_ENDIAN);
         header = XrgVectorHeader.read(headerbuf, new XrgVectorHeader());
         int nbyte = header.getNByte();
         int zbyte = header.getZByte();
@@ -29,14 +31,17 @@ public class XrgVector {
             // decompress the data
             LZ4Factory factory = LZ4Factory.fastestInstance();
             ByteBuffer zbuf = ByteBuffer.wrap(buf, XrgVectorHeader.HEADER_SIZE, zbyte);
-
+            zbuf.order(ByteOrder.LITTLE_ENDIAN);
             LZ4FastDecompressor decompressor = factory.fastDecompressor();
             data = ByteBuffer.allocate(nbyte);
+            data.order(ByteOrder.LITTLE_ENDIAN);
             decompressor.decompress(zbuf, data);
         } else {
             data = ByteBuffer.wrap(buf, XrgVectorHeader.HEADER_SIZE, nbyte);
+            data.order(ByteOrder.LITTLE_ENDIAN);
         }
         flag = ByteBuffer.wrap(buf, XrgVectorHeader.HEADER_SIZE + zbyte, nitem);
+        flag.order(ByteOrder.LITTLE_ENDIAN);
 
     }
 
