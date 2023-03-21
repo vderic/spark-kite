@@ -11,7 +11,6 @@ import java.util.Vector;
 import java.nio.ByteBuffer;
 import java.nio.LongBuffer;
 import java.nio.ByteOrder;
-import org.apache.arrow.vector.util.DecimalUtility;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Date;
@@ -127,7 +126,8 @@ public class XrgIterator {
                 if (ltyp == LogicalTypes.DECIMAL) {
                     values[i] = new BigDecimal(new BigInteger(bb.array()), scale);
                 } else {
-                    values[i] = new BigInteger(bb.array());
+                    // spark only support BigDecimal with scale 0
+                    values[i] = new BigDecimal(new BigInteger(bb.array()), 0);
                 }
             }
                 break;

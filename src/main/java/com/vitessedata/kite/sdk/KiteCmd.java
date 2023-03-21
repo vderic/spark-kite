@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.lang.StringBuffer;
 import org.json.*;
 import com.vitessedata.xrg.format.*;
+import java.math.BigInteger;
+import java.math.BigDecimal;
 
 public class KiteCmd {
 
@@ -111,6 +113,8 @@ public class KiteCmd {
             kite.submit();
             XrgIterator iter = null;
 
+            BigDecimal bigdec = BigDecimal.ZERO;
+
             while ((iter = kite.next()) != null) {
                 Object[] objs = iter.getValues();
                 for (int i = 0; i < objs.length; i++) {
@@ -118,10 +122,15 @@ public class KiteCmd {
                         System.out.print("|");
                     }
                     System.out.print(objs[i].toString());
+                    if (objs[i] instanceof BigDecimal) {
+                        bigdec = bigdec.add((BigDecimal) objs[i]);
+                    }
+
                 }
                 System.out.println();
             }
 
+            System.out.println("BIGDEC = " + bigdec);
         } catch (IOException ex) {
             System.err.println(ex);
         } finally {

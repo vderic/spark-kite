@@ -4,6 +4,8 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.DataType;
+import org.apache.spark.sql.types.DecimalType;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
@@ -15,25 +17,59 @@ import java.util.HashMap;
 import java.nio.ByteBuffer;
 import org.apache.arrow.vector.util.DecimalUtility;
 import java.math.BigDecimal;
+import org.json.*;
+import java.io.IOException;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileInputStream;
 
 public class CsvDataSourceRunner {
 
+    private static final String TABLE_NAME = "lineitem";
+
     public static void main(String[] args) {
 
-        if (args.length != 1) {
-            System.out.println("java class csvfile");
+        if (args.length != 2) {
+            System.out.println("java class schemafn sqlfn");
             return;
         }
 
-        String filepath = args[0];
+        String schemafn = args[0];
+        String sqlfn = args[1];
 
-        SparkSession sparkSession = SparkSession.builder().appName("data_source_test").getOrCreate();
+        StructType schema = null;
+        String sql = null;
+
+        try {
+            schema = getSchema(schemafn);
+
+            sql = getSQL(sqlfn);
+
+            /*
+             * StructField[] fields = schema.fields(); for (int i = 0; i < fields.length; i++) {
+             * System.out.println(fields[i]); DataType dtype = fields[i].dataType(); if (dtype instanceof DecimalType) {
+             * DecimalType dect = (DecimalType) dtype; System.out.println("DEC (" + dect.precision() + ", " +
+             * dect.scale() + ")"); } }
+             */
+
+        } catch (IOException ex) {
+            System.err.println(ex);
+            return;
+        }
+
+        System.exit(0);
+
+        SparkSession sparkSession = SparkSession.builder().appName("kite_app").getOrCreate();
 
         // Dataset<Row> dataset =
         // sparkSession.read().schema(getSchema()).format("com.bugdbug.customsource.csv.CSV").option("fileName",
         // "/home/ubuntu/p/big-data-projects/Datasource spark3/src/test/resources/1000 Sales Records.csv").load();
-        Dataset<Row> dataset = sparkSession.read().schema(getSchema()).format("kite").option("fileName", filepath)
-                .load();
+        Dataset<Row> dataset = sparkSession.read().schema(schema).format("kite")
+                .option("host", "localhost:7878,locahost:7879").option("path", "test_tpch/csv/lineitem*")
+                .option("filespec", "csv").option("fragcnt", "2").load();
+
+        dataset.createOrReplaceTempView(TABLE_NAME);
+        sparkSession.sql(sql).show(false);
 
         /* temp view */
         /*
@@ -50,9 +86,12 @@ public class CsvDataSourceRunner {
          * put("Total_Cost", "avg"); } };
          */
 
-        Map<String, String> aggr = Map.of("Unit_Price", "sum", "Total_Cost", "avg");
-
-        dataset.filter("Units_Sold > 2").groupBy("Item_Type").agg(aggr).show(false);
+        /* java 11 map */
+        /*
+         * Map<String, String> aggr = Map.of("Unit_Price", "sum", "Total_Cost", "avg");
+         *
+         * dataset.filter("Units_Sold > 2").groupBy("Item_Type").agg(aggr).show(false);
+         */
 
         /* required columns. use required.csv */
         // dataset.select("Region", "Country" , "Item_Type", "Sales_Channel").filter("Sales_Channel =
@@ -61,33 +100,78 @@ public class CsvDataSourceRunner {
         /* all columns. use 1000....csv */
         // dataset.filter("Sales_Channel = 'Online' or Unit_Price > 100").show(false);
 
-        byte[] b = new byte[32];
-        b[15] = 1;
-        b[31] = 2;
-        ByteBuffer bb = ByteBuffer.wrap(b);
-        BigDecimal dec1 = DecimalUtility.getBigDecimalFromByteBuffer(bb, 4, 16);
-        BigDecimal dec2 = DecimalUtility.getBigDecimalFromByteBuffer(bb, 4, 16);
-
-        System.out.println(dec1.toString() + " " + dec2.toString());
-
     }
 
-    private static StructType getSchema() {
-        StructField[] structFields = new StructField[] {
-                new StructField("Region", DataTypes.StringType, true, Metadata.empty()),
-                new StructField("Country", DataTypes.StringType, true, Metadata.empty()),
-                new StructField("Item_Type", DataTypes.StringType, true, Metadata.empty()),
-                new StructField("Sales_Channel", DataTypes.StringType, true, Metadata.empty()),
-                new StructField("Order_Priority", DataTypes.StringType, true, Metadata.empty()),
-                new StructField("Order_Date", DataTypes.StringType, true, Metadata.empty()),
-                new StructField("Order_ID", DataTypes.IntegerType, true, Metadata.empty()),
-                new StructField("Ship_Date", DataTypes.StringType, true, Metadata.empty()),
-                new StructField("Units_Sold", DataTypes.IntegerType, true, Metadata.empty()),
-                new StructField("Unit_Price", DataTypes.DoubleType, true, Metadata.empty()),
-                new StructField("Unit_Cost", DataTypes.DoubleType, true, Metadata.empty()),
-                new StructField("Total_Revenue", DataTypes.DoubleType, true, Metadata.empty()),
-                new StructField("Total_Cost", DataTypes.DoubleType, true, Metadata.empty()),
-                new StructField("Total_Profit", DataTypes.DoubleType, true, Metadata.empty()) };
-        return new StructType(structFields);
+    private static StructType getSchema(String schemafn) throws IOException {
+        JSONTokener tokener = new JSONTokener(new FileReader(schemafn));
+        JSONArray array = new JSONArray(tokener);
+
+        StructType schema = new StructType();
+
+        for (int i = 0; i < array.length(); i++) {
+            JSONObject obj = array.getJSONObject(i);
+            String name = obj.getString("name");
+            String type = obj.getString("type");
+            int precision = 0;
+            int scale = 0;
+            try {
+                precision = obj.getInt("precision");
+                scale = obj.getInt("scale");
+            } catch (JSONException ex) {
+                ;
+            }
+
+            switch (type) {
+            case "int8":
+                schema = schema.add(name, DataTypes.ByteType, true);
+                break;
+            case "int16":
+                schema = schema.add(name, DataTypes.ShortType, true);
+                break;
+            case "int32":
+                schema = schema.add(name, DataTypes.IntegerType, true);
+                break;
+            case "int64":
+                schema = schema.add(name, DataTypes.LongType, true);
+                break;
+            case "fp32":
+                schema = schema.add(name, DataTypes.FloatType, true);
+                break;
+            case "fp64":
+                schema = schema.add(name, DataTypes.DoubleType, true);
+                break;
+            case "date":
+                schema = schema.add(name, DataTypes.DateType, true);
+                break;
+            case "timestamp":
+                schema = schema.add(name, DataTypes.TimestampType, true);
+                break;
+            case "bytea":
+                schema = schema.add(name, DataTypes.BinaryType, true);
+            case "decimal":
+                schema = schema.add(name, DataTypes.createDecimalType(precision, scale), true);
+                break;
+            case "string":
+                schema = schema.add(name, DataTypes.StringType, true);
+                break;
+            default:
+                break;
+            }
+        }
+
+        return schema;
+    }
+
+    private static String getSQL(String sqlfn) throws IOException {
+        String sql = null;
+
+        File file = new File(sqlfn);
+        try (FileInputStream fis = new FileInputStream(file)) {
+            byte[] data = new byte[(int) file.length()];
+            fis.read(data);
+            sql = new String(data);
+            System.out.println("SQL: " + sql);
+        }
+        return sql;
     }
 }
