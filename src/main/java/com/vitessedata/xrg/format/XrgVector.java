@@ -36,6 +36,7 @@ public class XrgVector {
             data = ByteBuffer.allocate(nbyte);
             data.order(ByteOrder.LITTLE_ENDIAN);
             decompressor.decompress(zbuf, data);
+            data.rewind();
         } else {
             data = ByteBuffer.wrap(buf, XrgVectorHeader.HEADER_SIZE, nbyte);
             data.order(ByteOrder.LITTLE_ENDIAN);
