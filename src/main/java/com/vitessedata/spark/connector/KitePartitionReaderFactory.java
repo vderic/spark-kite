@@ -9,6 +9,7 @@ import org.apache.spark.sql.connector.expressions.aggregate.Aggregation;
 
 import com.vitessedata.kite.sdk.*;
 
+import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
 
@@ -33,7 +34,7 @@ public class KitePartitionReaderFactory implements PartitionReaderFactory {
         try {
             return new KitePartitionReader((KiteInputPartition) partition, schema, path, filespec, aggregation,
                     requiredSchema);
-        } catch (FileNotFoundException | URISyntaxException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
