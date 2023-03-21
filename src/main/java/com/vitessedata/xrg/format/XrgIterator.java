@@ -127,7 +127,7 @@ public class XrgIterator {
                     values[i] = new BigDecimal(new BigInteger(bb.array()), scale);
                 } else {
                     // spark only support BigDecimal with scale 0
-                    values[i] = new BigDecimal(new BigInteger(bb.array()), 0);
+                    values[i] = new BigInteger(bb.array());
                 }
             }
                 break;

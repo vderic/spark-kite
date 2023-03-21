@@ -114,6 +114,7 @@ public class KiteCmd {
             XrgIterator iter = null;
 
             BigDecimal bigdec = BigDecimal.ZERO;
+            BigInteger bigint = BigInteger.ZERO;
 
             while ((iter = kite.next()) != null) {
                 Object[] objs = iter.getValues();
@@ -124,13 +125,14 @@ public class KiteCmd {
                     System.out.print(objs[i].toString());
                     if (objs[i] instanceof BigDecimal) {
                         bigdec = bigdec.add((BigDecimal) objs[i]);
+                    } else if (objs[i] instanceof BigInteger) {
+                        bigint = bigint.add((BigInteger) objs[i]);
                     }
-
                 }
                 System.out.println();
             }
 
-            System.out.println("BIGDEC = " + bigdec);
+            System.out.println("BIGINT= " + bigint + " , BIGDEC = " + bigdec);
         } catch (IOException ex) {
             System.err.println(ex);
         } finally {
