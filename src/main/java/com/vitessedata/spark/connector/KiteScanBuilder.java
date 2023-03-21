@@ -17,7 +17,8 @@ import java.util.Map;
 
 public class KiteScanBuilder
         implements SupportsPushDownAggregates, SupportsPushDownV2Filters, SupportsPushDownRequiredColumns {
-    private StructType schema;
+    private final StructType schema;
+    private StructType requiredSchema;
     private final Map<String, String> properties;
     private final CaseInsensitiveStringMap options;
     private Aggregation aggregation;
@@ -95,11 +96,11 @@ public class KiteScanBuilder
 
     public void pruneColumns(StructType requiredSchema) {
         System.out.println("pruneColumns: " + requiredSchema.toString());
-        schema = requiredSchema;
+        this.requiredSchema = requiredSchema;
     }
 
     @Override
     public Scan build() {
-        return new KiteScan(schema, properties, options, aggregation);
+        return new KiteScan(schema, properties, options, aggregation, requiredSchema);
     }
 }

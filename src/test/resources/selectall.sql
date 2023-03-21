@@ -1,1 +1,1 @@
-select * from lineitem; 
+select * from "test_tpch/csv/lineitem*"; 
