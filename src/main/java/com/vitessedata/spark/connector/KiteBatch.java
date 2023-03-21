@@ -6,6 +6,7 @@ import org.apache.spark.sql.connector.read.PartitionReaderFactory;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.sql.util.CaseInsensitiveStringMap;
 import org.apache.spark.sql.connector.expressions.aggregate.Aggregation;
+import org.apache.spark.sql.connector.expressions.filter.Predicate;
 
 import java.util.Map;
 
@@ -21,13 +22,17 @@ public class KiteBatch implements Batch {
     private final int fragcnt;
     private final FileSpec filespec;
     private final String[] hosts;
+    private final String kite_schema;
+    private final String sql;
+    private final Predicate[] predicates;
 
     public KiteBatch(StructType schema, Map<String, String> properties, CaseInsensitiveStringMap options,
-            Aggregation aggregation, StructType requiredSchema) {
+            Aggregation aggregation, StructType requiredSchema, Predicate[] predicates) {
 
         this.schema = schema;
         this.requiredSchema = requiredSchema;
         this.aggregation = aggregation;
+        this.predicates = predicates;
         this.properties = properties;
         this.options = options;
         this.path = options.get("path");
@@ -47,6 +52,15 @@ public class KiteBatch implements Batch {
         }
         hosts = host.split(",");
 
+        /* TODO: we should build a SQL and Schema here */
+        kite_schema = Util.buildSchema(schema);
+        if (aggregation != null) {
+            sql = Util.buildAggregate(path, aggregation, predicates);
+        } else if (requiredSchema != null) {
+            sql = Util.buildProjection(path, requiredSchema, predicates);
+        } else {
+            sql = Util.buildProjection(path, schema, predicates);
+        }
     }
 
     @Override
@@ -62,6 +76,6 @@ public class KiteBatch implements Batch {
 
     @Override
     public PartitionReaderFactory createReaderFactory() {
-        return new KitePartitionReaderFactory(schema, path, filespec, aggregation, requiredSchema);
+        return new KitePartitionReaderFactory(schema, kite_schema, sql, filespec);
     }
 }

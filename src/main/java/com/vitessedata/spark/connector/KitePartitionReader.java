@@ -29,39 +29,24 @@ import com.vitessedata.xrg.format.*;
 public class KitePartitionReader implements PartitionReader<InternalRow> {
 
     private final KiteInputPartition csvInputPartition;
-    private final String path;
     private Iterator<String[]> iterator;
     private List<Function> valueConverters;
     private final StructType schema;
-    private final StructType requiredSchema;
-    private final Aggregation aggregation;
+    private final String kite_schema;
+    private final String sql;
     private final FileSpec filespec;
     private KiteConnection kite;
     private XrgIterator iter;
 
-    public KitePartitionReader(KiteInputPartition csvInputPartition, StructType schema, String path, FileSpec filespec,
-            Aggregation aggregation, StructType requiredSchema) throws IOException {
+    public KitePartitionReader(KiteInputPartition csvInputPartition, StructType schema, String kite_schema, String sql,
+            FileSpec filespec) throws IOException {
         this.csvInputPartition = csvInputPartition;
-        this.path = path;
         this.schema = schema;
-        this.requiredSchema = requiredSchema;
-        this.aggregation = aggregation;
+        this.kite_schema = kite_schema;
+        this.sql = sql;
         this.filespec = filespec;
-        this.valueConverters = ValueConverters.getConverters(schema);
         this.iter = null;
         createKite();
-    }
-
-    // Generate SQL for Kite
-    private String genSQL() {
-
-        return "";
-    }
-
-    // Generate Schema for Kite
-    private String genSchema() {
-
-        return "";
     }
 
     private String getHost() {
@@ -74,13 +59,11 @@ public class KitePartitionReader implements PartitionReader<InternalRow> {
 
     private void createKite() throws IOException {
 
-        String sql = genSQL();
-        String schema = genSchema();
         String host = getHost();
         Integer[] fragment = csvInputPartition.getFragment();
 
         kite = new KiteConnection();
-        kite.host(host).schema(schema).sql(sql).fragment(fragment[0], fragment[1]).format(filespec).submit();
+        kite.host(host).schema(kite_schema).sql(sql).fragment(fragment[0], fragment[1]).format(filespec).submit();
 
     }
 

@@ -3,6 +3,10 @@ package com.vitessedata.spark.connector;
 import org.apache.spark.sql.connector.read.Scan;
 import org.apache.spark.sql.connector.read.ScanBuilder;
 import org.apache.spark.sql.types.StructType;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.DataType;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.DecimalType;
 import org.apache.spark.sql.util.CaseInsensitiveStringMap;
 import org.apache.spark.sql.connector.read.SupportsPushDownAggregates;
 import org.apache.spark.sql.connector.read.SupportsPushDownV2Filters;
@@ -14,6 +18,7 @@ import org.apache.spark.sql.connector.expressions.aggregate.AggregateFunc;
 import org.apache.spark.sql.connector.expressions.Expression;
 
 import java.util.Map;
+import java.lang.StringBuffer;
 
 public class KiteScanBuilder
         implements SupportsPushDownAggregates, SupportsPushDownV2Filters, SupportsPushDownRequiredColumns {
@@ -101,6 +106,7 @@ public class KiteScanBuilder
 
     @Override
     public Scan build() {
-        return new KiteScan(schema, properties, options, aggregation, requiredSchema);
+        return new KiteScan(schema, properties, options, aggregation, requiredSchema, pushedPredicates);
     }
+
 }
