@@ -14,7 +14,7 @@ import com.vitessedata.kite.sdk.*;
 
 public class KiteBatch implements Batch {
     private final StructType schema;
-    private final StructType requiredSchema;
+    private final StructType outputSchema;
     private final Map<String, String> properties;
     private final CaseInsensitiveStringMap options;
     private final Aggregation aggregation;
@@ -27,10 +27,10 @@ public class KiteBatch implements Batch {
     private final Predicate[] predicates;
 
     public KiteBatch(StructType schema, Map<String, String> properties, CaseInsensitiveStringMap options,
-            Aggregation aggregation, StructType requiredSchema, Predicate[] predicates) {
+            Aggregation aggregation, StructType outputSchema, Predicate[] predicates) {
 
         this.schema = schema;
-        this.requiredSchema = requiredSchema;
+        this.outputSchema = outputSchema;
         this.aggregation = aggregation;
         this.predicates = predicates;
         this.properties = properties;
@@ -39,7 +39,13 @@ public class KiteBatch implements Batch {
         this.fragcnt = options.getInt("fragcnt", 4);
         String format = options.get("filespec");
         if (format.equalsIgnoreCase("csv")) {
-            this.filespec = new CsvFileSpec();
+            String delim = options.get("csv_delim");
+            String quote = options.get("csv_quote");
+            String escape = options.get("csv_escape");
+            boolean header = options.getBoolean("csv_header", false);
+            String nullstr = options.get("csv_nullstr");
+            this.filespec = new CsvFileSpec().delim(delim.charAt(0)).quote(quote.charAt(0)).escape(escape.charAt(0))
+                    .header_line(header).nullstr(nullstr);
         } else if (format.equalsIgnoreCase("parquet")) {
             this.filespec = new ParquetFileSpec();
         } else {
@@ -56,10 +62,8 @@ public class KiteBatch implements Batch {
         kite_schema = Util.buildSchema(schema);
         if (aggregation != null) {
             sql = Util.buildAggregate(path, aggregation, predicates);
-        } else if (requiredSchema != null) {
-            sql = Util.buildProjection(path, requiredSchema, predicates);
         } else {
-            sql = Util.buildProjection(path, schema, predicates);
+            sql = Util.buildProjection(path, outputSchema, predicates);
         }
     }
 

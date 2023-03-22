@@ -30,6 +30,7 @@ public class KiteScan implements Scan {
         this.options = options;
         this.aggregation = aggregation;
         this.predicates = predicates;
+        this.outSchema = null;
     }
 
     @Override
@@ -45,10 +46,14 @@ public class KiteScan implements Scan {
                     new StructField("SUM(Unit_Price)", DataTypes.DoubleType, true, Metadata.empty()) };
 
             outSchema = new StructType(structFields);
+        } else if (requiredSchema != null) {
+            outSchema = requiredSchema;
+        } else {
+            outSchema = schema;
         }
 
-        System.out.println(schema.toString());
-        return schema;
+        System.out.println(outSchema.toString());
+        return outSchema;
     }
 
     @Override
@@ -58,6 +63,6 @@ public class KiteScan implements Scan {
 
     @Override
     public Batch toBatch() {
-        return new KiteBatch(schema, properties, options, aggregation, requiredSchema, predicates);
+        return new KiteBatch(schema, properties, options, aggregation, outSchema, predicates);
     }
 }
