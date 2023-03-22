@@ -62,10 +62,15 @@ public class CsvDataSourceRunner {
         // sparkSession.read().schema(getSchema()).format("com.bugdbug.customsource.csv.CSV").option("fileName",
         // "/home/ubuntu/p/big-data-projects/Datasource spark3/src/test/resources/1000 Sales Records.csv").load();
         Dataset<Row> dataset = sparkSession.read().schema(schema).format("kite").option("host", "localhost:7878")
-                .option("path", "test_tpch/csv/lineitem*").option("filespec", "csv").option("fragcnt", 2).load();
+                .option("path", "test_tpch/csv/lineitem*").option("filespec", "csv").option("fragcnt", 4).load();
 
         dataset.createOrReplaceTempView(tablename);
-        sparkSession.sql(sql).repartition(2).show(false);
+
+        /*
+         * simple projection NOTE: make sure repartition() is called for parallel load. If not, only one fragment (0, N)
+         * will be used and only ONE fragment of the data will be received
+         */
+        sparkSession.sql(sql).repartition(4).show(false);
 
         /* temp view */
         /*
