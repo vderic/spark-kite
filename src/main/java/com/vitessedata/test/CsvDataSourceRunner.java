@@ -57,16 +57,13 @@ public class CsvDataSourceRunner {
             return;
         }
 
-        System.exit(0);
-
         SparkSession sparkSession = SparkSession.builder().appName("kite_app").getOrCreate();
 
         // Dataset<Row> dataset =
         // sparkSession.read().schema(getSchema()).format("com.bugdbug.customsource.csv.CSV").option("fileName",
         // "/home/ubuntu/p/big-data-projects/Datasource spark3/src/test/resources/1000 Sales Records.csv").load();
-        Dataset<Row> dataset = sparkSession.read().schema(schema).format("kite")
-                .option("host", "localhost:7878,locahost:7879").option("path", "test_tpch/csv/lineitem*")
-                .option("filespec", "csv").option("fragcnt", 2).load();
+        Dataset<Row> dataset = sparkSession.read().schema(schema).format("kite").option("host", "localhost:7878")
+                .option("path", "test_tpch/csv/lineitem*").option("filespec", "csv").option("fragcnt", 2).load();
 
         dataset.createOrReplaceTempView(TABLE_NAME);
         sparkSession.sql(sql).show(false);

@@ -75,13 +75,7 @@ public class XrgIterator {
                 values[i] = new Short(data.getShort());
                 break;
             case PhysicalTypes.INT32:
-                if (ltyp == LogicalTypes.DATE) {
-                    long offset = 24L * 3600L * 1000L;
-                    long datetime = data.getInt() * offset;
-                    values[i] = new java.sql.Date(datetime);
-                } else {
-                    values[i] = new Integer(data.getInt());
-                }
+                values[i] = new Integer(data.getInt());
                 break;
             case PhysicalTypes.INT64:
                 long int64 = data.getLong();
