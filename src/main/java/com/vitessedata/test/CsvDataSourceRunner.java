@@ -67,8 +67,12 @@ public class CsvDataSourceRunner {
         dataset.createOrReplaceTempView(tablename);
 
         /*
-         * simple projection NOTE: make sure repartition() is called for parallel load. If not, only one fragment (0, N)
-         * will be used and only ONE fragment of the data will be received
+         * NOTE:
+         *
+         * For simple projection, make sure repartition() is called for parallel load. If not, only one fragment (0, N)
+         * will be used and only ONE fragment of the data will be received.
+         *
+         * For Aggregate, repartition() is not required.
          */
         sparkSession.sql(sql).repartition(4).show(false);
 
