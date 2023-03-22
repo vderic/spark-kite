@@ -36,16 +36,39 @@ public class KiteBatch implements Batch {
         this.properties = properties;
         this.options = options;
         this.path = options.get("path");
+
+        if (this.path == null) {
+            throw new RuntimeException("path not defined yet");
+        }
+
         this.fragcnt = options.getInt("fragcnt", 4);
         String format = options.get("filespec");
+        if (format == null) {
+            throw new RuntimeException("filespec not defined yet. csv or parquet");
+        }
+
         if (format.equalsIgnoreCase("csv")) {
             String delim = options.get("csv_delim");
             String quote = options.get("csv_quote");
             String escape = options.get("csv_escape");
             boolean header = options.getBoolean("csv_header", false);
             String nullstr = options.get("csv_nullstr");
-            this.filespec = new CsvFileSpec().delim(delim.charAt(0)).quote(quote.charAt(0)).escape(escape.charAt(0))
-                    .header_line(header).nullstr(nullstr);
+            CsvFileSpec csv = new CsvFileSpec();
+            if (delim != null) {
+                csv.delim(delim.charAt(0));
+            }
+            if (quote != null) {
+                csv.quote(quote.charAt(0));
+            }
+            if (escape != null) {
+                csv.escape(escape.charAt(0));
+            }
+            if (nullstr != null) {
+                csv.nullstr(nullstr);
+            }
+            csv.header_line(header);
+
+            this.filespec = csv;
         } else if (format.equalsIgnoreCase("parquet")) {
             this.filespec = new ParquetFileSpec();
         } else {
@@ -65,6 +88,8 @@ public class KiteBatch implements Batch {
         } else {
             sql = Util.buildProjection(path, outputSchema, predicates);
         }
+        System.out.println("schema: " + kite_schema);
+        System.out.println("sql: " + sql);
     }
 
     @Override

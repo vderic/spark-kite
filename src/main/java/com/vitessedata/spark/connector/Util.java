@@ -29,7 +29,21 @@ public class Util {
 
     public static String buildProjection(String path, StructType schema, Predicate[] predicate) {
 
-        return null;
+        StringBuffer sb = new StringBuffer();
+        StructField[] fields = schema.fields();
+
+        sb.append("select ");
+        for (int i = 0; i < fields.length; i++) {
+            if (i > 0) {
+                sb.append(",");
+            }
+            sb.append(fields[i].name());
+        }
+        sb.append(" from \"");
+        sb.append(path);
+        sb.append('"');
+
+        return sb.toString();
     }
 
     public static String buildSchema(StructType schema) {
