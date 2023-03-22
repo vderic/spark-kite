@@ -65,7 +65,7 @@ public class CsvDataSourceRunner {
                 .option("path", "test_tpch/csv/lineitem*").option("filespec", "csv").option("fragcnt", 2).load();
 
         dataset.createOrReplaceTempView(tablename);
-        sparkSession.sql(sql).show(false);
+        sparkSession.sql(sql).repartition(2).show(false);
 
         /* temp view */
         /*
