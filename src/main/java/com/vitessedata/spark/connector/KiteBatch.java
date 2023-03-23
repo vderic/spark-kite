@@ -105,6 +105,6 @@ public class KiteBatch implements Batch {
 
     @Override
     public PartitionReaderFactory createReaderFactory() {
-        return new KitePartitionReaderFactory(schema, kite_schema, sql, filespec);
+        return new KitePartitionReaderFactory(outputSchema, kite_schema, sql, filespec);
     }
 }
