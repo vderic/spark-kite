@@ -80,9 +80,7 @@ public class KitePartitionReader implements PartitionReader<InternalRow> {
         Object[] convertedValues = new Object[values.length];
 
         for (int i = 0; i < values.length; i++) {
-            if (flags[i] != 0) {
-                values[i] = null;
-            } else if (values[i] == null) {
+            if (flags[i] != 0 || values[i] == null) {
                 convertedValues[i] = null;
             } else if (values[i] instanceof BigInteger) {
                 convertedValues[i] = Decimal.apply((BigInteger) values[i]);
