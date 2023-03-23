@@ -16,6 +16,8 @@ import org.apache.spark.sql.connector.expressions.aggregate.*;
 import org.apache.spark.sql.connector.expressions.filter.Predicate;
 import org.apache.spark.sql.connector.expressions.aggregate.AggregateFunc;
 import org.apache.spark.sql.connector.expressions.Expression;
+import org.apache.spark.sql.connector.expressions.FieldReference;
+import org.apache.spark.sql.connector.expressions.NamedReference;
 
 import java.util.Map;
 import java.lang.StringBuffer;
@@ -46,14 +48,26 @@ public class KiteScanBuilder
         AggregateFunc[] func = aggregation.aggregateExpressions();
         Expression[] expr = aggregation.groupByExpressions();
 
-        System.out.println("Group By Columns");
+        System.out.println("Group By Columns" + expr.length);
         for (int i = 0; i < expr.length; i++) {
             System.out.println(expr[i].describe());
+            Expression[] child = expr[i].children();
+            System.out.println("group by child " + child.length);
+            for (int j = 0; j < child.length; j++) {
+                System.out.println(child[j].describe());
+            }
         }
 
         System.out.println("Aggregate ");
         for (int i = 0; i < func.length; i++) {
             System.out.println(func[i].describe());
+            Expression[] child = func[i].children();
+            for (int j = 0; j < child.length; j++) {
+                if (child[j] instanceof NamedReference) {
+                    System.out.println("is a field" + ((NamedReference) child[j]).fieldNames()[0]);
+                }
+                System.out.println("child " + child[j].getClass().getName() + " " + child[j].describe());
+            }
             if (func[i] instanceof Avg) {
                 System.out.println("AVG FOUND.. not supported");
                 return false;

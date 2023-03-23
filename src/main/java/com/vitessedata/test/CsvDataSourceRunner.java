@@ -74,7 +74,8 @@ public class CsvDataSourceRunner {
          *
          * For Aggregate, repartition() is not required.
          */
-        sparkSession.sql(sql).repartition(4).show(false);
+        // sparkSession.sql(sql).repartition(2).show(false);
+        sparkSession.sql(sql).show(false);
 
         /* temp view */
         /*

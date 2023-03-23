@@ -16,6 +16,7 @@ import org.apache.spark.sql.connector.expressions.aggregate.*;
 import org.apache.spark.sql.connector.expressions.filter.Predicate;
 import org.apache.spark.sql.connector.expressions.aggregate.AggregateFunc;
 import org.apache.spark.sql.connector.expressions.Expression;
+import org.apache.spark.sql.connector.expressions.NamedReference;
 
 import java.util.Map;
 import java.lang.StringBuffer;
@@ -24,7 +25,40 @@ public class Util {
 
     public static String buildAggregate(String path, Aggregation aggregation, Predicate[] predicate) {
 
-        return null;
+        StringBuffer sb = new StringBuffer();
+        AggregateFunc[] funcs = aggregation.aggregateExpressions();
+        Expression[] exprs = aggregation.groupByExpressions();
+
+        sb.append("SELECT ");
+        for (Expression expr : exprs) {
+            sb.append(expr.describe());
+            sb.append(", ");
+        }
+
+        for (int i = 0; i < funcs.length; i++) {
+            AggregateFunc func = funcs[i];
+            if (i > 0) {
+                sb.append(", ");
+            }
+            sb.append(func.describe());
+        }
+
+        sb.append(" FROM \"");
+        sb.append(path);
+        sb.append('"');
+        // sb.append(" WHERE ");
+
+        sb.append(" GROUP BY ");
+
+        for (int i = 0; i < exprs.length; i++) {
+            Expression expr = exprs[i];
+            if (i > 0) {
+                sb.append(", ");
+            }
+            sb.append(expr.describe());
+        }
+
+        return sb.toString();
     }
 
     public static String buildProjection(String path, StructType schema, Predicate[] predicate) {
@@ -32,14 +66,14 @@ public class Util {
         StringBuffer sb = new StringBuffer();
         StructField[] fields = schema.fields();
 
-        sb.append("select ");
+        sb.append("SELECT ");
         for (int i = 0; i < fields.length; i++) {
             if (i > 0) {
                 sb.append(",");
             }
             sb.append(fields[i].name());
         }
-        sb.append(" from \"");
+        sb.append(" FROM \"");
         sb.append(path);
         sb.append('"');
 

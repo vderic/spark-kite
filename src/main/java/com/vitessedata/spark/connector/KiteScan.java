@@ -2,13 +2,19 @@ package com.vitessedata.spark.connector;
 
 import org.apache.spark.sql.connector.read.Batch;
 import org.apache.spark.sql.connector.read.Scan;
+import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.DecimalType;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.sql.util.CaseInsensitiveStringMap;
 import org.apache.spark.sql.connector.expressions.aggregate.Aggregation;
 import org.apache.spark.sql.connector.expressions.filter.Predicate;
+import org.apache.spark.sql.connector.expressions.aggregate.*;
+import org.apache.spark.sql.connector.expressions.aggregate.AggregateFunc;
+import org.apache.spark.sql.connector.expressions.Expression;
+import org.apache.spark.sql.connector.expressions.NamedReference;
 
 import java.util.Map;
 
@@ -33,19 +39,90 @@ public class KiteScan implements Scan {
         this.outSchema = null;
     }
 
+    /* TODO: compare the old and new type */
+    private DataType getMaxType(DataType oldtyp, DataType newtyp) {
+
+        return newtyp;
+    }
+
+    private DataType getReturnType(StructType schema, Expression[] exprs) {
+        DataType ret = null;
+        StructField[] fields = schema.fields();
+
+        for (Expression expr : exprs) {
+            if (expr instanceof NamedReference) {
+                String cname = expr.describe();
+                int idx = schema.fieldIndex(cname);
+                DataType typ = fields[idx].dataType();
+                ret = getMaxType(ret, typ);
+
+            } else {
+                DataType typ = getReturnType(schema, expr.children());
+                ret = getMaxType(ret, typ);
+            }
+        }
+        ;
+
+        return ret;
+    }
+
     @Override
     public StructType readSchema() {
         // return schema;
 
         if (aggregation != null) {
             /* aggregate */
-            StructField[] structFields = new StructField[] {
-                    new StructField("Item_Type", DataTypes.StringType, true, Metadata.empty()),
-                    new StructField("SUM(Total_Cost)", DataTypes.DoubleType, true, Metadata.empty()),
-                    new StructField("COUNT(Total_Cost)", DataTypes.IntegerType, true, Metadata.empty()),
-                    new StructField("SUM(Unit_Price)", DataTypes.DoubleType, true, Metadata.empty()) };
 
-            outSchema = new StructType(structFields);
+            AggregateFunc[] funcs = aggregation.aggregateExpressions();
+            Expression[] exprs = aggregation.groupByExpressions();
+            StructField[] fields = schema.fields();
+
+            outSchema = new StructType();
+
+            for (Expression expr : exprs) {
+                String cname = expr.describe();
+                int idx = schema.fieldIndex(cname);
+                outSchema = outSchema.add(fields[idx]);
+            }
+
+            for (AggregateFunc func : funcs) {
+                // decimal -> BigDecimal, Long -> BigDecimal, int32 -> Long, Float -> Double, Double -> Double
+                if (func instanceof Sum) {
+                    Sum sum = (Sum) func;
+                    DataType typ = getReturnType(schema, func.children());
+                    if (typ.equals(DataTypes.ByteType) || typ.equals(DataTypes.ShortType)
+                            || typ.equals(DataTypes.IntegerType)) {
+                        outSchema = outSchema.add(sum.describe(), DataTypes.LongType);
+                    } else if (typ.equals(DataTypes.LongType)) {
+                        outSchema = outSchema.add(sum.describe(), DataTypes.createDecimalType());
+                    } else if (typ instanceof DecimalType) {
+                        DecimalType dectype = (DecimalType) typ;
+                        int precision = dectype.precision();
+                        int scale = dectype.scale();
+                        outSchema = outSchema.add(sum.describe(), DataTypes.createDecimalType(precision, scale));
+                    } else if (typ.equals(DataTypes.FloatType) || typ.equals(DataTypes.DoubleType)) {
+                        outSchema = outSchema.add(sum.describe(), DataTypes.DoubleType);
+                    } else {
+                        throw new RuntimeException("sum() type not supported. " + typ.toString());
+                    }
+
+                }
+
+                // same as the input type
+                if (func instanceof Min || func instanceof Max) {
+                    Expression[] e = func.children();
+                    DataType typ = getReturnType(schema, func.children());
+                    outSchema = outSchema.add(func.describe(), typ);
+
+                }
+
+                // Long type
+                if (func instanceof Count || func instanceof CountStar) {
+                    outSchema = outSchema.add(func.describe(), DataTypes.LongType);
+                }
+
+            }
+
         } else if (requiredSchema != null) {
             outSchema = requiredSchema;
         } else {
