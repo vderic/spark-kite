@@ -23,7 +23,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileInputStream;
 
-public class CsvDataSourceRunner {
+public class KiteDataSourceRunner {
 
     public static void main(String[] args) {
 
