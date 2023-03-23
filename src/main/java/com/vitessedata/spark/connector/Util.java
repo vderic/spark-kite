@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Vector;
+import java.util.Arrays;
 import java.lang.StringBuffer;
 
 public class Util {
@@ -31,6 +32,14 @@ public class Util {
         Vector<Predicate> pushedPredicates = new Vector<>();
         Vector<Predicate> nonpushedPredicates = new Vector<>();
 
+        for (Predicate p : predicates) {
+            if (p.name().equals("IS_NULL") || p.name().equals("IS_NOT_NULL")) {
+                nonpushedPredicates.add(p);
+            } else {
+                pushedPredicates.add(p);
+            }
+        }
+
         list.add(nonpushedPredicates.toArray(new Predicate[nonpushedPredicates.size()]));
         list.add(pushedPredicates.toArray(new Predicate[pushedPredicates.size()]));
 
@@ -39,6 +48,18 @@ public class Util {
 
     private static void buildPredicate(StringBuffer sb, Predicate[] predicates) {
 
+        for (int i = 0; i < predicates.length; i++) {
+            Predicate p = predicates[i];
+            String name = p.name();
+            Expression[] exprs = p.children();
+
+            if (i > 0) {
+                sb.append(" AND ");
+            }
+            sb.append('(');
+            sb.append(p.describe());
+            sb.append(')');
+        }
     }
 
     public static String buildAggregate(String path, Aggregation aggregation, Predicate[] predicates) {

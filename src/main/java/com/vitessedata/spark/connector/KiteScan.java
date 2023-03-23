@@ -68,7 +68,6 @@ public class KiteScan implements Scan {
 
     @Override
     public StructType readSchema() {
-        // return schema;
 
         if (aggregation != null) {
             /* aggregate */
