@@ -19,11 +19,29 @@ import org.apache.spark.sql.connector.expressions.Expression;
 import org.apache.spark.sql.connector.expressions.NamedReference;
 
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Vector;
 import java.lang.StringBuffer;
 
 public class Util {
 
-    public static String buildAggregate(String path, Aggregation aggregation, Predicate[] predicate) {
+    public static List<Predicate[]> checkPredicates(Predicate[] predicates) {
+        List<Predicate[]> list = new ArrayList<>();
+        Vector<Predicate> pushedPredicates = new Vector<>();
+        Vector<Predicate> nonpushedPredicates = new Vector<>();
+
+        list.add(nonpushedPredicates.toArray(new Predicate[nonpushedPredicates.size()]));
+        list.add(pushedPredicates.toArray(new Predicate[pushedPredicates.size()]));
+
+        return list;
+    }
+
+    private static void buildPredicate(StringBuffer sb, Predicate[] predicates) {
+
+    }
+
+    public static String buildAggregate(String path, Aggregation aggregation, Predicate[] predicates) {
 
         StringBuffer sb = new StringBuffer();
         AggregateFunc[] funcs = aggregation.aggregateExpressions();
@@ -46,7 +64,11 @@ public class Util {
         sb.append(" FROM \"");
         sb.append(path);
         sb.append('"');
-        // sb.append(" WHERE ");
+
+        if (predicates.length > 0) {
+            sb.append(" WHERE ");
+            buildPredicate(sb, predicates);
+        }
 
         sb.append(" GROUP BY ");
 
@@ -61,7 +83,7 @@ public class Util {
         return sb.toString();
     }
 
-    public static String buildProjection(String path, StructType schema, Predicate[] predicate) {
+    public static String buildProjection(String path, StructType schema, Predicate[] predicates) {
 
         StringBuffer sb = new StringBuffer();
         StructField[] fields = schema.fields();
@@ -76,6 +98,11 @@ public class Util {
         sb.append(" FROM \"");
         sb.append(path);
         sb.append('"');
+
+        if (predicates.length > 0) {
+            sb.append(" WHERE ");
+            buildPredicate(sb, predicates);
+        }
 
         return sb.toString();
     }

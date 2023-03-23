@@ -20,6 +20,7 @@ import org.apache.spark.sql.connector.expressions.FieldReference;
 import org.apache.spark.sql.connector.expressions.NamedReference;
 
 import java.util.Map;
+import java.util.List;
 import java.lang.StringBuffer;
 
 public class KiteScanBuilder
@@ -76,8 +77,9 @@ public class KiteScanBuilder
             System.out.println("Filter[" + i + "]: " + predicates[i].toString());
         }
 
-        pushedPredicates = predicates;
-        nonpushedPredicates = new Predicate[0];
+        List<Predicate[]> list = Util.checkPredicates(predicates);
+        nonpushedPredicates = list.get(0);
+        pushedPredicates = list.get(1);
         return nonpushedPredicates;
     }
 
