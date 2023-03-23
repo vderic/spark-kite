@@ -40,6 +40,9 @@ public class Util {
             }
         }
 
+        /* TODO: need support IS_NULL and IS_NOT_NULL. partial predicate push down make aggregate not working */
+        // pushedPredicates.addAll(Arrays.asList(predicates));
+
         list.add(nonpushedPredicates.toArray(new Predicate[nonpushedPredicates.size()]));
         list.add(pushedPredicates.toArray(new Predicate[pushedPredicates.size()]));
 
@@ -86,7 +89,7 @@ public class Util {
         sb.append(path);
         sb.append('"');
 
-        if (predicates.length > 0) {
+        if (predicates != null && predicates.length > 0) {
             sb.append(" WHERE ");
             buildPredicate(sb, predicates);
         }
@@ -120,7 +123,7 @@ public class Util {
         sb.append(path);
         sb.append('"');
 
-        if (predicates.length > 0) {
+        if (predicates != null && predicates.length > 0) {
             sb.append(" WHERE ");
             buildPredicate(sb, predicates);
         }

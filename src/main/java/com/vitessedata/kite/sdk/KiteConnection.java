@@ -74,7 +74,7 @@ public class KiteConnection {
 
         sockstream.send(KiteMessage.KIT1, null);
 
-        System.out.println(json);
+        // System.out.println(json);
         sockstream.send(KiteMessage.JSON, json.getBytes());
 
     }

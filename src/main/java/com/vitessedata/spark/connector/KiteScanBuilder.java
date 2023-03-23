@@ -45,18 +45,18 @@ public class KiteScanBuilder
 
     public boolean pushAggregation(Aggregation aggregation) {
 
-        System.out.println("pushAggregation");
+        // System.out.println("pushAggregation");
         AggregateFunc[] func = aggregation.aggregateExpressions();
         Expression[] expr = aggregation.groupByExpressions();
 
         for (int i = 0; i < func.length; i++) {
-            System.out.println(func[i].describe());
+            // System.out.println(func[i].describe());
             Expression[] child = func[i].children();
             if (func[i] instanceof Avg) {
                 return false;
             }
         }
-        System.out.println("END pushAggregation");
+        // System.out.println("END pushAggregation");
 
         this.aggregation = aggregation;
         return true;
@@ -72,10 +72,10 @@ public class KiteScanBuilder
 
     /* Pushes down predicates, and returns predicates that need to be evaluated after scanning */
     public Predicate[] pushPredicates(Predicate[] predicates) {
-        System.out.println("pushPredicate:");
-        for (int i = 0; i < predicates.length; i++) {
-            System.out.println("Filter[" + i + "]: " + predicates[i].toString());
-        }
+        // System.out.println("pushPredicate:");
+        // for (int i = 0; i < predicates.length; i++) {
+        // System.out.println("Filter[" + i + "]: " + predicates[i].toString());
+        // }
 
         List<Predicate[]> list = Util.checkPredicates(predicates);
         nonpushedPredicates = list.get(0);
@@ -85,7 +85,7 @@ public class KiteScanBuilder
 
     /* Returns the predicates that are pushed to the data source via pushPredicates(Predicate[]) */
     public Predicate[] pushedPredicates() {
-        System.out.println("pushedPredicates: pushed nothing");
+        // System.out.println("pushedPredicates: pushed nothing");
         if (pushedPredicates == null) {
             pushedPredicates = new Predicate[0];
         }
@@ -93,7 +93,7 @@ public class KiteScanBuilder
     }
 
     public void pruneColumns(StructType requiredSchema) {
-        System.out.println("pruneColumns: " + requiredSchema.toString());
+        // System.out.println("pruneColumns: " + requiredSchema.toString());
         this.requiredSchema = requiredSchema;
     }
 

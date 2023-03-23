@@ -44,13 +44,6 @@ public class KiteDataSourceRunner {
 
             sql = getSQL(sqlfn);
 
-            /*
-             * StructField[] fields = schema.fields(); for (int i = 0; i < fields.length; i++) {
-             * System.out.println(fields[i]); DataType dtype = fields[i].dataType(); if (dtype instanceof DecimalType) {
-             * DecimalType dect = (DecimalType) dtype; System.out.println("DEC (" + dect.precision() + ", " +
-             * dect.scale() + ")"); } }
-             */
-
         } catch (IOException ex) {
             System.err.println(ex);
             return;
@@ -58,9 +51,6 @@ public class KiteDataSourceRunner {
 
         SparkSession sparkSession = SparkSession.builder().appName("kite_app").getOrCreate();
 
-        // Dataset<Row> dataset =
-        // sparkSession.read().schema(getSchema()).format("com.bugdbug.customsource.csv.CSV").option("fileName",
-        // "/home/ubuntu/p/big-data-projects/Datasource spark3/src/test/resources/1000 Sales Records.csv").load();
         Dataset<Row> dataset = sparkSession.read().schema(schema).format("kite").option("host", "localhost:7878")
                 .option("path", "test_tpch/csv/lineitem*").option("filespec", "csv").option("fragcnt", 4).load();
 
@@ -74,37 +64,17 @@ public class KiteDataSourceRunner {
          *
          * For Aggregate, repartition() is not required.
          */
-        // sparkSession.sql(sql).repartition(2).show(false);
-        sparkSession.sql(sql).show(false);
-
-        /* temp view */
-        /*
-         * dataset.createOrReplaceTempView("bug"); //Dataset<Row> regionset = sparkSession.
-         * sql("select Item_Type, min(Unit_Price) as min_price, max(Total_Revenue) as max_revenue,  max(Total_Cost) as max_cost from bug group by Item_Type"
-         * ); Dataset<Row> regionset = sparkSession.
-         * sql("select Item_Type, avg(Unit_Price) as avg_price, sum(Total_Cost) as sum_cost from bug where Units_Sold > 2 group by Item_Type"
-         * ); regionset.show(false);
-         */
-
-        /* aggregate case. use aggregate.csv */
-        /*
-         * java 8 Map<String, String> aggr = new HashMap<String, String>() { { put("Unit_Price", "sum");
-         * put("Total_Cost", "avg"); } };
-         */
+        sparkSession.sql(sql).repartition(2).show(false);
+        // sparkSession.sql(sql).show(false);
 
         /* java 11 map */
-        /*
-         * Map<String, String> aggr = Map.of("Unit_Price", "sum", "Total_Cost", "avg");
-         *
-         * dataset.filter("Units_Sold > 2").groupBy("Item_Type").agg(aggr).show(false);
-         */
+        Map<String, String> aggr = Map.of("l_discount", "sum", "l_extendedprice", "avg");
+
+        dataset.filter("l_quantity < 2").groupBy("l_linestatus").agg(aggr).explain(true);
 
         /* required columns. use required.csv */
-        // dataset.select("Region", "Country" , "Item_Type", "Sales_Channel").filter("Sales_Channel =
-        // 'Online'").show(false);
-
-        /* all columns. use 1000....csv */
-        // dataset.filter("Sales_Channel = 'Online' or Unit_Price > 100").show(false);
+        dataset.select("l_orderkey", "l_linestatus", "l_discount", "l_extendedprice").filter("l_quantity > 2")
+                .explain(true);
 
     }
 
