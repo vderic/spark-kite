@@ -88,20 +88,19 @@ public class KiteScan implements Scan {
             for (AggregateFunc func : funcs) {
                 // decimal -> BigDecimal, Long -> BigDecimal, int32 -> Long, Float -> Double, Double -> Double
                 if (func instanceof Sum) {
-                    Sum sum = (Sum) func;
                     DataType typ = getReturnType(schema, func.children());
                     if (typ.equals(DataTypes.ByteType) || typ.equals(DataTypes.ShortType)
                             || typ.equals(DataTypes.IntegerType)) {
-                        outSchema = outSchema.add(sum.describe(), DataTypes.LongType);
+                        outSchema = outSchema.add(func.describe(), DataTypes.LongType);
                     } else if (typ.equals(DataTypes.LongType)) {
-                        outSchema = outSchema.add(sum.describe(), DataTypes.createDecimalType());
+                        outSchema = outSchema.add(func.describe(), DataTypes.createDecimalType());
                     } else if (typ instanceof DecimalType) {
                         DecimalType dectype = (DecimalType) typ;
                         int precision = dectype.precision();
                         int scale = dectype.scale();
-                        outSchema = outSchema.add(sum.describe(), DataTypes.createDecimalType(precision, scale));
+                        outSchema = outSchema.add(func.describe(), DataTypes.createDecimalType(precision, scale));
                     } else if (typ.equals(DataTypes.FloatType) || typ.equals(DataTypes.DoubleType)) {
-                        outSchema = outSchema.add(sum.describe(), DataTypes.DoubleType);
+                        outSchema = outSchema.add(func.describe(), DataTypes.DoubleType);
                     } else {
                         throw new RuntimeException("sum() type not supported. " + typ.toString());
                     }
