@@ -93,6 +93,10 @@ public class XrgIterator {
                 break;
             case PhysicalTypes.BYTEA: {
                 int basz = data.getInt();
+                if (basz == 0) {
+                    values[i] = null;
+                    break;
+                }
                 byte[] ba = new byte[basz];
                 data.get(ba);
                 if (ltyp == LogicalTypes.STRING) {
