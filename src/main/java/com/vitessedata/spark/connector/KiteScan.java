@@ -93,7 +93,7 @@ public class KiteScan implements Scan {
                             || typ.equals(DataTypes.IntegerType)) {
                         outSchema = outSchema.add(func.describe(), DataTypes.LongType);
                     } else if (typ.equals(DataTypes.LongType)) {
-                        outSchema = outSchema.add(func.describe(), DataTypes.createDecimalType());
+                        outSchema = outSchema.add(func.describe(), DataTypes.createDecimalType(38, 0));
                     } else if (typ instanceof DecimalType) {
                         DecimalType dectype = (DecimalType) typ;
                         int precision = dectype.precision();
