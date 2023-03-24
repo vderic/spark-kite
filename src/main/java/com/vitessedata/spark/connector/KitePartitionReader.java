@@ -29,8 +29,6 @@ import com.vitessedata.xrg.format.*;
 public class KitePartitionReader implements PartitionReader<InternalRow> {
 
     private final KiteInputPartition csvInputPartition;
-    private Iterator<String[]> iterator;
-    private List<Function> valueConverters;
     private final StructType schema;
     private final String kite_schema;
     private final String sql;
