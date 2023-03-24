@@ -63,19 +63,19 @@ public class Request {
 
     public JSONObject toJSON() {
         if (schema == null) {
-            throw new RuntimeException("schema not defined yet");
+            throw new IllegalArgumentException("schema not defined yet");
         }
 
         if (fragcnt == 0 || fragid >= fragcnt) {
-            throw new RuntimeException("fragment not defined yet. (" + fragid + "," + fragcnt + ")");
+            throw new IllegalArgumentException("fragment not defined yet. (" + fragid + "," + fragcnt + ")");
         }
 
         if (sql == null) {
-            throw new RuntimeException("sql not defined yet");
+            throw new IllegalArgumentException("sql not defined yet");
         }
 
         if (filespec == null) {
-            throw new RuntimeException("file format not defined yet");
+            throw new IllegalArgumentException("file format not defined yet");
         }
 
         JSONObject json = new JSONObject();
