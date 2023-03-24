@@ -36,7 +36,7 @@ public class KitePartitionReader implements PartitionReader<InternalRow> {
     private final String sql;
     private final FileSpec filespec;
     private KiteConnection kite;
-    private XrgIterator iter;
+    private InternalRow currentRow;
 
     public KitePartitionReader(KiteInputPartition csvInputPartition, StructType schema, String kite_schema, String sql,
             FileSpec filespec) throws IOException {
@@ -45,7 +45,7 @@ public class KitePartitionReader implements PartitionReader<InternalRow> {
         this.kite_schema = kite_schema;
         this.sql = sql;
         this.filespec = filespec;
-        this.iter = null;
+        this.currentRow = null;
         createKite();
     }
 
@@ -69,12 +69,21 @@ public class KitePartitionReader implements PartitionReader<InternalRow> {
 
     @Override
     public boolean next() throws IOException {
-        iter = kite.next();
-        return (iter != null);
+        XrgIterator iter = kite.next();
+        if (iter != null) {
+            currentRow = getCurrentRow(iter);
+            return true;
+        }
+        currentRow = null;
+        return false;
     }
 
     @Override
     public InternalRow get() {
+        return currentRow;
+    }
+
+    private InternalRow getCurrentRow(XrgIterator iter) {
         Object[] values = iter.getValues();
         byte[] flags = iter.getFlags();
         Object[] convertedValues = new Object[values.length];
