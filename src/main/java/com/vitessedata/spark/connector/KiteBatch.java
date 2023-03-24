@@ -38,13 +38,13 @@ public class KiteBatch implements Batch {
         this.path = options.get("path");
 
         if (this.path == null) {
-            throw new RuntimeException("path not defined yet");
+            throw new IllegalArgumentException("path not defined yet");
         }
 
         this.fragcnt = options.getInt("fragcnt", 4);
         String format = options.get("filespec");
         if (format == null) {
-            throw new RuntimeException("filespec not defined yet. csv or parquet");
+            throw new IllegalArgumentException("filespec not defined yet. csv or parquet");
         }
 
         if (format.equalsIgnoreCase("csv")) {
@@ -72,12 +72,12 @@ public class KiteBatch implements Batch {
         } else if (format.equalsIgnoreCase("parquet")) {
             this.filespec = new ParquetFileSpec();
         } else {
-            throw new RuntimeException("filespec only supports csv or parquet");
+            throw new IllegalArgumentException("filespec only supports csv or parquet");
         }
 
         String host = options.get("host");
         if (host == null) {
-            throw new RuntimeException("host not found");
+            throw new IllegalArgumentException("host not found");
         }
         hosts = host.split(",");
 
