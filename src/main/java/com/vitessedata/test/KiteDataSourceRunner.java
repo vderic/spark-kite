@@ -124,6 +124,7 @@ public class KiteDataSourceRunner {
                 break;
             case "bytea":
                 schema = schema.add(name, DataTypes.BinaryType, true);
+                break;
             case "decimal":
                 schema = schema.add(name, DataTypes.createDecimalType(precision, scale), true);
                 break;
