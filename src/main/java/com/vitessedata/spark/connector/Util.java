@@ -176,4 +176,25 @@ public class Util {
         return sb.toString();
     }
 
+    public static boolean isIntegral(DataType typ) {
+        if (typ == null) {
+            return false;
+        }
+        if (typ.equals(DataTypes.LongType) || typ.equals(DataTypes.IntegerType) || typ.equals(DataTypes.ByteType)
+                || typ.equals(DataTypes.ShortType)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isFloating(DataType typ) {
+        if (typ == null) {
+            return false;
+        }
+        if (typ.equals(DataTypes.FloatType) || typ.equals(DataTypes.DoubleType)) {
+            return true;
+        }
+        return false;
+    }
+
 }

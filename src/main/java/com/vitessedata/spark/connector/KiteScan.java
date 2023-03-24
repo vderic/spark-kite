@@ -41,8 +41,59 @@ public class KiteScan implements Scan {
 
     /* TODO: compare the old and new type */
     private DataType getMaxType(DataType oldtyp, DataType newtyp) {
+        if (oldtyp == null) {
+            return newtyp;
+        }
 
-        return newtyp;
+        if (oldtyp instanceof DecimalType) {
+            return oldtyp;
+        }
+
+        if (oldtyp.equals(DataTypes.DoubleType)) {
+            if (newtyp instanceof DecimalType) {
+                return newtyp;
+            }
+            return oldtyp;
+        }
+
+        if (oldtyp.equals(DataTypes.FloatType)) {
+            if (newtyp instanceof DecimalType || newtyp.equals(DataTypes.DoubleType)) {
+                return newtyp;
+            } else if (newtyp.equals(DataTypes.LongType)) {
+                return DataTypes.DoubleType;
+            }
+            return oldtyp;
+        }
+
+        if (oldtyp.equals(DataTypes.LongType)) {
+            if (newtyp instanceof DecimalType || newtyp.equals(DataTypes.DoubleType)) {
+                return newtyp;
+            } else if (newtyp.equals(DataTypes.FloatType)) {
+                return DataTypes.DoubleType;
+            }
+            return oldtyp;
+        }
+
+        if (oldtyp.equals(DataTypes.IntegerType)) {
+            if (newtyp instanceof DecimalType || newtyp.equals(DataTypes.DoubleType)
+                    || newtyp.equals(DataTypes.FloatType) || newtyp.equals(DataTypes.LongType)) {
+                return newtyp;
+            }
+            return oldtyp;
+        }
+
+        if (oldtyp.equals(DataTypes.ShortType)) {
+            if (newtyp.equals(DataTypes.ByteType)) {
+                return oldtyp;
+            }
+            return newtyp;
+        }
+
+        if (oldtyp.equals(DataTypes.ByteType)) {
+            return newtyp;
+        }
+
+        throw new IllegalArgumentException("getMaxType type not supported. " + newtyp.toString());
     }
 
     private DataType getReturnType(StructType schema, Expression[] exprs) {
