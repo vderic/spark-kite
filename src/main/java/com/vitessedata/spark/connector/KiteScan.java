@@ -96,7 +96,7 @@ public class KiteScan implements Scan {
         throw new IllegalArgumentException("getMaxType type not supported. " + newtyp.toString());
     }
 
-    private DataType getReturnType(StructType schema, Expression[] exprs) {
+    private DataType getColType(StructType schema, Expression[] exprs) {
         DataType ret = null;
         StructField[] fields = schema.fields();
 
@@ -108,7 +108,7 @@ public class KiteScan implements Scan {
                 ret = getMaxType(ret, typ);
 
             } else {
-                DataType typ = getReturnType(schema, expr.children());
+                DataType typ = getColType(schema, expr.children());
                 ret = getMaxType(ret, typ);
             }
         }
@@ -138,7 +138,7 @@ public class KiteScan implements Scan {
             for (AggregateFunc func : funcs) {
                 // decimal -> BigDecimal, Long -> BigDecimal, int32 -> Long, Float -> Double, Double -> Double
                 if (func instanceof Sum) {
-                    DataType typ = getReturnType(schema, func.children());
+                    DataType typ = getColType(schema, func.children());
                     if (typ.equals(DataTypes.ByteType) || typ.equals(DataTypes.ShortType)
                             || typ.equals(DataTypes.IntegerType)) {
                         outSchema = outSchema.add(func.describe(), DataTypes.LongType);
@@ -160,7 +160,7 @@ public class KiteScan implements Scan {
                 // same as the input type
                 if (func instanceof Min || func instanceof Max) {
                     Expression[] e = func.children();
-                    DataType typ = getReturnType(schema, func.children());
+                    DataType typ = getColType(schema, func.children());
                     outSchema = outSchema.add(func.describe(), typ);
 
                 }
