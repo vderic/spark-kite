@@ -141,16 +141,17 @@ public class KiteScan implements Scan {
                     DataType typ = getColType(schema, func.children());
                     if (typ.equals(DataTypes.ByteType) || typ.equals(DataTypes.ShortType)
                             || typ.equals(DataTypes.IntegerType)) {
-                        outSchema = outSchema.add(func.describe(), DataTypes.LongType);
+                        outSchema = outSchema.add(func.describe(), DataTypes.LongType, false);
                     } else if (typ.equals(DataTypes.LongType)) {
-                        outSchema = outSchema.add(func.describe(), DataTypes.createDecimalType(38, 0));
+                        outSchema = outSchema.add(func.describe(), DataTypes.createDecimalType(38, 0), false);
                     } else if (typ instanceof DecimalType) {
                         DecimalType dectype = (DecimalType) typ;
                         int precision = dectype.precision();
                         int scale = dectype.scale();
-                        outSchema = outSchema.add(func.describe(), DataTypes.createDecimalType(precision, scale));
+                        outSchema = outSchema.add(func.describe(), DataTypes.createDecimalType(precision, scale),
+                                false);
                     } else if (typ.equals(DataTypes.FloatType) || typ.equals(DataTypes.DoubleType)) {
-                        outSchema = outSchema.add(func.describe(), DataTypes.DoubleType);
+                        outSchema = outSchema.add(func.describe(), DataTypes.DoubleType, false);
                     } else {
                         throw new RuntimeException("sum() type not supported. " + typ.toString());
                     }
@@ -161,13 +162,13 @@ public class KiteScan implements Scan {
                 if (func instanceof Min || func instanceof Max) {
                     Expression[] e = func.children();
                     DataType typ = getColType(schema, func.children());
-                    outSchema = outSchema.add(func.describe(), typ);
+                    outSchema = outSchema.add(func.describe(), typ, false);
 
                 }
 
                 // Long type
                 if (func instanceof Count || func instanceof CountStar) {
-                    outSchema = outSchema.add(func.describe(), DataTypes.LongType);
+                    outSchema = outSchema.add(func.describe(), DataTypes.LongType, false);
                 }
 
             }
