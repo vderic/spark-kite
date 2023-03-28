@@ -12,6 +12,14 @@
 	<description>Kite Spark Connector which contain both Java and Scala</description>
 
 	<dependencies>
+	<dependency>
+		<groupId>com.vitessedata.kite</groupId>
+		<artifactId>kite-sdk</artifactId>
+		<version>1.0</version>
+		<scope>system</scope>
+		<systemPath>${basedir}/lib/kite-sdk-1.0.jar</systemPath>
+	</dependency>
+
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.12</artifactId>
