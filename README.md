@@ -39,6 +39,8 @@ sudo apt-get install sbt
 ```
 
 # Run on a Spark standalone cluster in client deploy mode
+
+```
 ./bin/spark-submit --class com.vitessedata.test.KiteDataSourceRunner \
   --master local[2] \
   --executor-memory 20G \
@@ -46,28 +48,28 @@ sudo apt-get install sbt
  target/spark-kite-1.0-SNAPSHOT.jar \
  lineitem $HOME/p/spark-kite/src/test/resources/lineitemdec.schema \
  $HOME/p/spark-kite/src/test/resources/aggregate.sql
+ ```
 
 
 # Java code sample
 
 ```
-        SparkSession sparkSession = SparkSession.builder().appName("kite_app").getOrCreate();
+SparkSession sparkSession = SparkSession.builder().appName("kite_app").getOrCreate();
 
-        Dataset<Row> dataset = sparkSession.read().schema(schema).format("kite").option("host", "localhost:7878")
-                .option("path", "test_tpch/csv/lineitem*").option("filespec", "csv").option("fragcnt", 4).load();
+Dataset<Row> dataset = sparkSession.read().schema(schema).format("kite").option("host", "localhost:7878")
+    .option("path", "test_tpch/csv/lineitem*").option("filespec", "csv").option("fragcnt", 4).load();
 
-        dataset.createOrReplaceTempView(tablename);
+dataset.createOrReplaceTempView(tablename);
 
-        /*
-         * NOTE:
-         *
-         * For simple projection, make sure repartition() is called for parallel load. If not, only one fragment (0, N)
-         * will be used and only ONE fragment of the data will be received.
-         *
-         * For Aggregate, repartition() is not required.
-         */
-        sparkSession.sql(sql).repartition(2).show(false);
-
+/*
+ * NOTE:
+ *
+ * For simple projection, make sure repartition() is called for parallel load. If not, only one fragment (0, N)
+ * will be used and only ONE fragment of the data will be received.
+ *
+ * For Aggregate, repartition() is not required.
+*/
+    sparkSession.sql(sql).repartition(2).show(false);
 ```
 
 # Executors Scheduling
