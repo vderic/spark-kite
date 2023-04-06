@@ -43,15 +43,13 @@ sudo apt-get install sbt
 ```
 ./bin/spark-submit --class com.vitessedata.test.KiteDataSourceRunner \
   --master local[2] \
-  --executor-memory 20G \
-  --total-executor-cores 100 \
- target/spark-kite-1.0-SNAPSHOT.jar \
- lineitem $HOME/p/spark-kite/src/test/resources/lineitemdec.schema \
- $HOME/p/spark-kite/src/test/resources/aggregate.sql
+  target/spark-kite-1.0-SNAPSHOT.jar \
+  lineitem $HOME/p/spark-kite/src/test/resources/lineitemdec.schema \
+  $HOME/p/spark-kite/src/test/resources/aggregate.sql
  ```
 
 
-# Java code sample
+# Code sample in Java
 
 ```
 SparkSession sparkSession = SparkSession.builder().appName("kite_app").getOrCreate();
