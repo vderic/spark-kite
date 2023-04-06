@@ -38,6 +38,8 @@ sudo apt-get install sbt
 % mvn clean package
 ```
 
+4. Copy `kite-client-sdk/java/target/kite-sdk-1.0.jar` and `spark-kite/target/spark-kite-1.0-SNAPSHOT.jar` to `$SPARK_HOME/jars` for all machines in cluster
+
 # Run on a Spark standalone cluster in local mode
 
 ```
