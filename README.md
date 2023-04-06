@@ -72,6 +72,20 @@ dataset.createOrReplaceTempView(tablename);
     sparkSession.sql(sql).repartition(2).show(false);
 ```
 
+# Spark Options
+
+| Option name | Description | Mandatory |
+|-------------|-------------|----------|
+| host        | host1:port1,host2:port2,...,hostN:portN |  True |
+| path        | Path in kite. e.g. test_tpch/csv/lineitem\* | True |
+| fragcnt     | Number of fragments | True |
+| filespec    | Either csv or parquet | True |
+| csv_delim   | CSV delimiter (default ',') | False |
+| csv_escape  | CSV escape character (default '"') | False |
+| csv_quote   | CSV quote character (default '"') | False |
+| csv_header  | CSV header boolean (default false) | False |
+| csv_nullstr | CSV NULL string (default '') | False |
+
 # Executors Scheduling
 The number of cores assigned to each executor is configurable. When spark.executor.cores is explicitly set, multiple executors from the same application may be launched on the same worker if the worker has enough cores and memory. Otherwise, each executor grabs all the cores available on the worker by default, in which case only one executor per application may be launched on each worker during one single schedule iteration.
 
