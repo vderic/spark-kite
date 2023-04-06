@@ -38,7 +38,7 @@ sudo apt-get install sbt
 % mvn clean package
 ```
 
-# Run on a Spark standalone cluster in client deploy mode
+# Run on a Spark standalone cluster in local mode
 
 ```
 ./bin/spark-submit --class com.vitessedata.test.KiteDataSourceRunner \
