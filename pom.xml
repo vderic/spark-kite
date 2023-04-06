@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.vitessedata</groupId>
-	<artifactId>spark-kite-connector</artifactId>
+	<artifactId>spark-kite</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<name>Kite Spark Connector</name>
 	<description>Kite Spark Connector which contain both Java and Scala</description>
