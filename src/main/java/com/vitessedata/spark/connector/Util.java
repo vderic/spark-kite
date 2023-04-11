@@ -150,9 +150,9 @@ public class Util {
             } else if (dtype.equals(DataTypes.LongType)) {
                 sb.append("int64:0:0\n");
             } else if (dtype.equals(DataTypes.FloatType)) {
-                sb.append("fp32:0:0\n");
+                sb.append("float:0:0\n");
             } else if (dtype.equals(DataTypes.DoubleType)) {
-                sb.append("fp64:0:0\n");
+                sb.append("double:0:0\n");
             } else if (dtype.equals(DataTypes.DateType)) {
                 sb.append("date:0:0\n");
             } else if (dtype.equals(DataTypes.TimestampType)) {
