@@ -110,10 +110,10 @@ public class KiteDataSourceRunner {
             case "int64":
                 schema = schema.add(name, DataTypes.LongType, true);
                 break;
-            case "fp32":
+            case "float":
                 schema = schema.add(name, DataTypes.FloatType, true);
                 break;
-            case "fp64":
+            case "double":
                 schema = schema.add(name, DataTypes.DoubleType, true);
                 break;
             case "date":
