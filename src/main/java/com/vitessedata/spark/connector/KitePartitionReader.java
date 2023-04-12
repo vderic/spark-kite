@@ -28,7 +28,7 @@ import com.vitessedata.xrg.format.*;
 
 public class KitePartitionReader implements PartitionReader<InternalRow> {
 
-    private final KiteInputPartition csvInputPartition;
+    private final KiteInputPartition kiteInputPartition;
     private final StructType schema;
     private final String kite_schema;
     private final String sql;
@@ -36,9 +36,9 @@ public class KitePartitionReader implements PartitionReader<InternalRow> {
     private KiteConnection kite;
     private InternalRow currentRow;
 
-    public KitePartitionReader(KiteInputPartition csvInputPartition, StructType schema, String kite_schema, String sql,
+    public KitePartitionReader(KiteInputPartition kiteInputPartition, StructType schema, String kite_schema, String sql,
             FileSpec filespec) throws IOException {
-        this.csvInputPartition = csvInputPartition;
+        this.kiteInputPartition = kiteInputPartition;
         this.schema = schema;
         this.kite_schema = kite_schema;
         this.sql = sql;
@@ -48,8 +48,8 @@ public class KitePartitionReader implements PartitionReader<InternalRow> {
     }
 
     private String getHost() {
-        Integer[] fragment = csvInputPartition.getFragment();
-        String[] hosts = csvInputPartition.preferredLocations();
+        Integer[] fragment = kiteInputPartition.getFragment();
+        String[] hosts = kiteInputPartition.preferredLocations();
 
         int idx = fragment[0] % hosts.length;
         return hosts[idx];
@@ -58,7 +58,7 @@ public class KitePartitionReader implements PartitionReader<InternalRow> {
     private void createKite() throws IOException {
 
         String host = getHost();
-        Integer[] fragment = csvInputPartition.getFragment();
+        Integer[] fragment = kiteInputPartition.getFragment();
 
         kite = new KiteConnection();
         kite.host(host).schema(kite_schema).sql(sql).fragment(fragment[0], fragment[1]).format(filespec).submit();
