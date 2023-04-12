@@ -32,16 +32,7 @@ public class Util {
         Vector<Predicate> pushedPredicates = new Vector<>();
         Vector<Predicate> nonpushedPredicates = new Vector<>();
 
-        for (Predicate p : predicates) {
-            if (p.name().equals("IS_NULL") || p.name().equals("IS_NOT_NULL")) {
-                nonpushedPredicates.add(p);
-            } else {
-                pushedPredicates.add(p);
-            }
-        }
-
-        /* TODO: need support IS_NULL and IS_NOT_NULL. partial predicate push down make aggregate not working */
-        // pushedPredicates.addAll(Arrays.asList(predicates));
+        pushedPredicates.addAll(Arrays.asList(predicates));
 
         list.add(nonpushedPredicates.toArray(new Predicate[nonpushedPredicates.size()]));
         list.add(pushedPredicates.toArray(new Predicate[pushedPredicates.size()]));
