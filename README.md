@@ -56,7 +56,8 @@ sudo apt-get install sbt
 ```
 SparkSession sparkSession = SparkSession.builder().appName("kite_app").getOrCreate();
 
-Dataset<Row> dataset = sparkSession.read().schema(schema).format("kite")
+Dataset<Row> dataset = sparkSession.read().schema(schema)
+                                          .format("kite")
                                           .option("host", "localhost:7878")
                                           .option("path", "test_tpch/csv/lineitem*")
                                           .option("filespec", "csv")
@@ -76,6 +77,8 @@ sparkSession.sql(sql).repartition(2).show(false);
 ```
 
 # Spark Options
+
+Specify the format with the value "kite" and the options belows.
 
 | Option name | Description | Mandatory |
 |-------------|-------------|----------|
