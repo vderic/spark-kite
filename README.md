@@ -56,8 +56,11 @@ sudo apt-get install sbt
 ```
 SparkSession sparkSession = SparkSession.builder().appName("kite_app").getOrCreate();
 
-Dataset<Row> dataset = sparkSession.read().schema(schema).format("kite").option("host", "localhost:7878")
-    .option("path", "test_tpch/csv/lineitem*").option("filespec", "csv").option("fragcnt", 4).load();
+Dataset<Row> dataset = sparkSession.read().schema(schema).format("kite")
+                                          .option("host", "localhost:7878")
+                                          .option("path", "test_tpch/csv/lineitem*")
+                                          .option("filespec", "csv")
+                                          .option("fragcnt", 4).load();
 
 dataset.createOrReplaceTempView(tablename);
 
