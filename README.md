@@ -1,6 +1,6 @@
-# Kite Connector
+# Spark Kite Connector
 
-spark-kite connector is READONLY connector that allows querying data stored in Kite.
+Spark kite connector is READONLY connector that allows querying data stored in Kite.  This connector is compatible with spark 3.3.2 or above.
 
 # Compilation
 
