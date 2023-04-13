@@ -29,37 +29,6 @@
             <artifactId>spark-sql_2.12</artifactId>
             <version>3.3.2</version>
         </dependency>
-        <dependency>
-            <groupId>com.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-            <version>4.1</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.4.200</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-sql-kafka-0-10 -->
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql-kafka-0-10_2.12</artifactId>
-            <version>3.3.2</version>
-            <scope>provided</scope>
-        </dependency>
-    <dependency> <!-- arrow vector dependency -->
-      <groupId>org.apache.arrow</groupId>
-      <artifactId>arrow-vector</artifactId>
-      <version>7.0.0</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency> <!-- arrow memory dependency -->
-      <groupId>org.apache.arrow</groupId>
-      <artifactId>arrow-memory-core</artifactId>
-      <version>7.0.0</version>
-      <scope>provided</scope>
-    </dependency>
     <dependency>
       <groupId>org.lz4</groupId>
       <artifactId>lz4-java</artifactId>
