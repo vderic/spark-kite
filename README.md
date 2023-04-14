@@ -47,8 +47,8 @@ sudo apt-get install sbt
   --master local[2] \
   jars/spark-kite-1.0-SNAPSHOT.jar \
   lineitem $HOME/p/spark-kite/src/test/resources/lineitemdec.schema \
-  $HOME/p/spark-kite/src/test/resources/aggregate.sql \
-  "kite://localhost:7878/test_tpch/csv/lineitem*"
+  "kite://localhost:7878/test_tpch/csv/lineitem*" \
+  $HOME/p/spark-kite/src/test/resources/aggregate.sql
  ```
 
 

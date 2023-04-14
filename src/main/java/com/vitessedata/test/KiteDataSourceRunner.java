@@ -28,14 +28,14 @@ public class KiteDataSourceRunner {
     public static void main(String[] args) {
 
         if (args.length != 4) {
-            System.out.println("java class tablename schemafn sqlfn url");
+            System.out.println("java class tablename schemafn url sqlfn");
             return;
         }
 
         String tablename = args[0];
         String schemafn = args[1];
-        String sqlfn = args[2];
-        String url = args[3];
+        String url = args[2];
+        String sqlfn = args[3];
 
         StructType schema = null;
         String sql = null;
