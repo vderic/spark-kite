@@ -45,7 +45,7 @@ sudo apt-get install sbt
 Run the command spark-submit,
 
 ```
-./bin/spark-submit --class com.vitessedata.spark.driver.KiteDataSourceRunner \
+% ./bin/spark-submit --class com.vitessedata.spark.driver.KiteDataSourceRunner \
   --master local[2] \
   $HOME/p/spark-kite/target/spark-kite-3.3.2-tests.jar \
   lineitem $HOME/p/spark-kite/src/test/resources/lineitem.schema \
@@ -57,7 +57,7 @@ Run the command spark-submit,
 Run the command spark-shell,
 
 ```
- spark-shell --master local[2] -i src/test/resources/spark-shell.scala
+% spark-shell --master local[2] -i src/test/resources/spark-shell.scala
 Setting default log level to "WARN".
 To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
 23/04/14 16:16:33 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
