@@ -93,7 +93,7 @@ Specify the format with the value "kite" and the options belows.
 | csv_header  | CSV header boolean (default false) | False |
 | csv_nullstr | CSV NULL string (default '') | False |
 
-# Add spark-kite to your Maven project 
+# Development with spark-kite in Java/Scala
 
 1. Install the jar file to Maven
 
