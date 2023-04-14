@@ -45,7 +45,7 @@ sudo apt-get install sbt
 ```
 ./bin/spark-submit --class com.vitessedata.spark.driver.KiteDataSourceRunner \
   --master local[2] \
-  jars/spark-kite-3.3.2.jar \
+  $HOME/p/spark-kite/target/spark-kite-3.3.2-tests.jar \
   lineitem $HOME/p/spark-kite/src/test/resources/lineitem.schema \
   "kite://localhost:7878/test_tpch/csv/lineitem*" \
   $HOME/p/spark-kite/src/test/resources/aggregate.sql
