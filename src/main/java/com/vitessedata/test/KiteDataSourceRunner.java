@@ -27,22 +27,37 @@ public class KiteDataSourceRunner {
 
     public static void main(String[] args) {
 
-        if (args.length != 3) {
-            System.out.println("java class tablename schemafn sqlfn");
+        if (args.length != 4) {
+            System.out.println("java class tablename schemafn sqlfn url");
             return;
         }
 
         String tablename = args[0];
         String schemafn = args[1];
         String sqlfn = args[2];
+        String url = args[3];
 
         StructType schema = null;
         String sql = null;
+        String host = null;
+        String path = null;
 
         try {
             schema = getSchema(schemafn);
 
             sql = getSQL(sqlfn);
+
+            if (!url.startsWith("kite://")) {
+                throw new IllegalArgumentException("URL format: kite://host2:port2,host2:port2,...,hostN:portN/path");
+            }
+
+            String[] parts = url.substring(7).split("/", 2);
+            if (parts.length != 2) {
+                throw new IllegalArgumentException("URL format: kite://host2:port2,host2:port2,...,hostN:portN/path");
+            }
+
+            host = parts[0];
+            path = parts[1];
 
         } catch (IOException ex) {
             System.err.println(ex);
@@ -51,8 +66,8 @@ public class KiteDataSourceRunner {
 
         SparkSession sparkSession = SparkSession.builder().appName("kite_app").getOrCreate();
 
-        Dataset<Row> dataset = sparkSession.read().schema(schema).format("kite").option("host", "localhost:7878")
-                .option("path", "test_tpch/csv/lineitem*").option("filespec", "csv").option("fragcnt", 4).load();
+        Dataset<Row> dataset = sparkSession.read().schema(schema).format("kite").option("host", host)
+                .option("path", path).option("filespec", "csv").option("fragcnt", 4).load();
 
         dataset.createOrReplaceTempView(tablename);
 
