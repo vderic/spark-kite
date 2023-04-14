@@ -1,4 +1,4 @@
-package com.vitessedata.test;
+package com.vitessedata.spark.driver;
 
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;

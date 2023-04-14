@@ -43,10 +43,10 @@ sudo apt-get install sbt
 # Run on a Spark standalone cluster in local mode
 
 ```
-./bin/spark-submit --class com.vitessedata.test.KiteDataSourceRunner \
+./bin/spark-submit --class com.vitessedata.spark.driver.KiteDataSourceRunner \
   --master local[2] \
   jars/spark-kite-1.0-SNAPSHOT.jar \
-  lineitem $HOME/p/spark-kite/src/test/resources/lineitemdec.schema \
+  lineitem $HOME/p/spark-kite/src/test/resources/lineitem.schema \
   "kite://localhost:7878/test_tpch/csv/lineitem*" \
   $HOME/p/spark-kite/src/test/resources/aggregate.sql
  ```
