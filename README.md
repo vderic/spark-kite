@@ -52,7 +52,7 @@ sudo apt-get install sbt
  ```
 
 
-To run with `spark-shell --master local[2]`,
+Run the command spark-shell `spark-shell --master local[2] -i src/test/resources/spark-shell.scala`,
 
 ```
 import org.apache.spark.sql.{Row, SparkSession}
@@ -84,7 +84,7 @@ val dfr = spark.read.format("kite").schema(schema)
         
 val df = dfr.load()
 df.createOrReplaceTempView("lineitem")
-spark.sql("select l_linestatus, count(*) from lineitem group by l_linestatus").show()
+spark.sql("select l_linestatus, avg(l_discount) from lineitem group by l_linestatus").show()
 
 ```
 
