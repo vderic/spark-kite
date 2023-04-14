@@ -38,14 +38,14 @@ sudo apt-get install sbt
 % mvn clean package
 ```
 
-4. Copy `kite-client-sdk/java/target/kite-sdk-1.0.jar` and `spark-kite/target/spark-kite-1.0-SNAPSHOT.jar` to `$SPARK_HOME/jars` for all machines in cluster
+4. Copy `kite-client-sdk/java/target/kite-sdk-1.0.jar` and `spark-kite/target/spark-kite-3.3.2.jar` to `$SPARK_HOME/jars` for all machines in cluster
 
 # Run on a Spark standalone cluster in local mode
 
 ```
 ./bin/spark-submit --class com.vitessedata.spark.driver.KiteDataSourceRunner \
   --master local[2] \
-  jars/spark-kite-1.0-SNAPSHOT.jar \
+  jars/spark-kite-3.3.2.jar \
   lineitem $HOME/p/spark-kite/src/test/resources/lineitem.schema \
   "kite://localhost:7878/test_tpch/csv/lineitem*" \
   $HOME/p/spark-kite/src/test/resources/aggregate.sql
@@ -92,6 +92,24 @@ Specify the format with the value "kite" and the options belows.
 | csv_quote   | CSV quote character (default '"') | False |
 | csv_header  | CSV header boolean (default false) | False |
 | csv_nullstr | CSV NULL string (default '') | False |
+
+# Add spark-kite to your Maven project 
+
+1. Install the jar file to Maven
+
+```
+% mvn clean install
+```
+
+2. Add dependency of spark-kite to your Maven project file pom.xml
+
+```
+        <dependency>
+            <groupId>com.vitessedata.spark</groupId>
+            <artifactId>spark-kite</artifactId>
+            <version>3.3.2</version>
+        </dependency>
+```
 
 # Executors Scheduling
 The number of cores assigned to each executor is configurable. When spark.executor.cores is explicitly set, multiple executors from the same application may be launched on the same worker if the worker has enough cores and memory. Otherwise, each executor grabs all the cores available on the worker by default, in which case only one executor per application may be launched on each worker during one single schedule iteration.
