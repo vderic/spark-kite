@@ -42,6 +42,8 @@ sudo apt-get install sbt
 
 # Run on a Spark standalone cluster in local mode
 
+Run the command spark-submit,
+
 ```
 ./bin/spark-submit --class com.vitessedata.spark.driver.KiteDataSourceRunner \
   --master local[2] \
@@ -52,7 +54,44 @@ sudo apt-get install sbt
  ```
 
 
-Run the command spark-shell `spark-shell --master local[2] -i src/test/resources/spark-shell.scala`,
+Run the command spark-shell,
+
+```
+ spark-shell --master local[2] -i src/test/resources/spark-shell.scala
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+23/04/14 16:16:33 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Spark context Web UI available at http://4b73d9cb7a30:4040
+Spark context available as 'sc' (master = local[2], app id = local-1681485393905).
+Spark session available as 'spark'.
+StructType(StructField(l_linestatus,StringType,true),StructField(SUM(l_discount),DoubleType,false),StructField(COUNT(l_discount),LongType,false))
++------------+--------------------+
+|l_linestatus|     avg(l_discount)|
++------------+--------------------+
+|           F|0.050353178607467214|
+|           O|0.049716358839050144|
++------------+--------------------+
+```
+
+# Development with spark-kite in Java/Scala
+
+1. Install the jar file to Maven
+
+```
+% mvn clean install
+```
+
+2. Add dependency of spark-kite to your Maven project file pom.xml
+
+```
+        <dependency>
+            <groupId>com.vitessedata.spark</groupId>
+            <artifactId>spark-kite</artifactId>
+            <version>3.3.2</version>
+        </dependency>
+```
+
+## Code sample in Scala
 
 ```
 import org.apache.spark.sql.{Row, SparkSession}
@@ -81,29 +120,11 @@ val dfr = spark.read.format("kite").schema(schema)
         .option("path", "test_tpch/csv/lineitem*")
         .option("filespec", "csv")
         .option("fragcnt", 4)
-        
+
 val df = dfr.load()
 df.createOrReplaceTempView("lineitem")
 spark.sql("select l_linestatus, avg(l_discount) from lineitem group by l_linestatus").show()
 
-```
-
-# Development with spark-kite in Java/Scala
-
-1. Install the jar file to Maven
-
-```
-% mvn clean install
-```
-
-2. Add dependency of spark-kite to your Maven project file pom.xml
-
-```
-        <dependency>
-            <groupId>com.vitessedata.spark</groupId>
-            <artifactId>spark-kite</artifactId>
-            <version>3.3.2</version>
-        </dependency>
 ```
 
 ## Code sample in Java
