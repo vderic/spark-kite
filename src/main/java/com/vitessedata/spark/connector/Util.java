@@ -85,14 +85,16 @@ public class Util {
             buildPredicate(sb, predicates);
         }
 
-        sb.append(" GROUP BY ");
+        if (exprs.length > 0) {
+            sb.append(" GROUP BY ");
 
-        for (int i = 0; i < exprs.length; i++) {
-            Expression expr = exprs[i];
-            if (i > 0) {
-                sb.append(", ");
+            for (int i = 0; i < exprs.length; i++) {
+                Expression expr = exprs[i];
+                if (i > 0) {
+                    sb.append(", ");
+                }
+                sb.append(expr.describe());
             }
-            sb.append(expr.describe());
         }
 
         return sb.toString();
