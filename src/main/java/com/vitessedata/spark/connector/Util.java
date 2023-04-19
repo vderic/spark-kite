@@ -16,6 +16,7 @@ import org.apache.spark.sql.connector.expressions.aggregate.*;
 import org.apache.spark.sql.connector.expressions.filter.Predicate;
 import org.apache.spark.sql.connector.expressions.aggregate.AggregateFunc;
 import org.apache.spark.sql.connector.expressions.Expression;
+import org.apache.spark.sql.connector.expressions.LiteralValue;
 import org.apache.spark.sql.connector.expressions.NamedReference;
 
 import java.util.Map;
@@ -24,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Vector;
 import java.util.Arrays;
 import java.lang.StringBuffer;
+import java.sql.Date;
+import java.sql.Timestamp;
 
 public class Util {
 
@@ -40,23 +43,91 @@ public class Util {
         return list;
     }
 
-    private static void buildPredicate(StringBuffer sb, Predicate[] predicates) {
+    private static Date toDate(Integer i) {
+        long ts = i.longValue();
+        ts *= 24 * 3600 * 1000;
+        return new Date(ts);
+    }
+
+    private static String getKiteOp(String op) {
+        if (op.equals("IS_NULL")) {
+            return "IS NULL";
+        } else if (op.equals("IS_NOT_NULL")) {
+            return "IS NOT NULL";
+        } else if (op.equals("STARTS_WITH")) {
+            return "LIKE";
+        } else if (op.equals("ENDS_WITH")) {
+            return "LIKE";
+        } else if (op.equals("CONTAINS")) {
+            return "LIKE";
+        } else if (op.equals("<=>")) {
+            return "=";
+        }
+        return op;
+    }
+
+    private static void buildPredicate(StructType schema, StringBuffer sb, Predicate[] predicates) {
 
         for (int i = 0; i < predicates.length; i++) {
             Predicate p = predicates[i];
-            String name = p.name();
+            String op = p.name();
             Expression[] exprs = p.children();
 
             if (i > 0) {
                 sb.append(" AND ");
             }
             sb.append('(');
-            sb.append(p.describe());
+
+            String cname = exprs[0].describe();
+            int idx = schema.fieldIndex(exprs[0].describe());
+            StructField[] fields = schema.fields();
+            DataType coltype = fields[idx].dataType();
+            if (exprs.length > 1 && (coltype.equals(DataTypes.DateType) || coltype.equals(DataTypes.TimestampType))) {
+                sb.append(cname);
+                sb.append(' ');
+                sb.append(getKiteOp(op));
+
+                if (exprs.length > 2) {
+                    sb.append('(');
+                }
+
+                for (int j = 1; j < exprs.length; j++) {
+
+                    if (j > 1) {
+                        sb.append(",");
+                    }
+
+                    if (exprs[j] instanceof LiteralValue) {
+                        LiteralValue v = (LiteralValue) exprs[j];
+                        DataType valuetype = v.dataType();
+                        if (valuetype.equals(DataTypes.DateType)) {
+                            Integer date = (Integer) v.value();
+                            sb.append(" DATE '");
+                            sb.append(toDate(date).toString());
+                            sb.append('\'');
+                        } else if (valuetype.equals(DataTypes.TimestampType)) {
+                            Long ts = (Long) v.value();
+                            sb.append(" TIMESTAMP '");
+                            sb.append(new Timestamp(ts).toString());
+                            sb.append('\'');
+                        }
+                    } else {
+                        throw new IllegalStateException("predicate right side is not literal value");
+                    }
+                }
+
+                if (exprs.length > 2) {
+                    sb.append(')');
+                }
+            } else {
+                sb.append(p.describe());
+            }
             sb.append(')');
         }
     }
 
-    public static String buildAggregate(String path, Aggregation aggregation, Predicate[] predicates) {
+    public static String buildAggregate(StructType schema, String path, Aggregation aggregation,
+            Predicate[] predicates) {
 
         StringBuffer sb = new StringBuffer();
         AggregateFunc[] funcs = aggregation.aggregateExpressions();
@@ -82,7 +153,7 @@ public class Util {
 
         if (predicates != null && predicates.length > 0) {
             sb.append(" WHERE ");
-            buildPredicate(sb, predicates);
+            buildPredicate(schema, sb, predicates);
         }
 
         if (exprs.length > 0) {
@@ -100,10 +171,11 @@ public class Util {
         return sb.toString();
     }
 
-    public static String buildProjection(String path, StructType schema, Predicate[] predicates) {
+    public static String buildProjection(StructType schema, String path, StructType requiredSchema,
+            Predicate[] predicates) {
 
         StringBuffer sb = new StringBuffer();
-        StructField[] fields = schema.fields();
+        StructField[] fields = requiredSchema.fields();
 
         sb.append("SELECT ");
         for (int i = 0; i < fields.length; i++) {
@@ -118,7 +190,7 @@ public class Util {
 
         if (predicates != null && predicates.length > 0) {
             sb.append(" WHERE ");
-            buildPredicate(sb, predicates);
+            buildPredicate(schema, sb, predicates);
         }
 
         return sb.toString();

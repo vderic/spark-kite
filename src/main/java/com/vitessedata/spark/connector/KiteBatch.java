@@ -84,9 +84,9 @@ public class KiteBatch implements Batch {
         /* we should build a SQL and Schema here */
         kite_schema = Util.buildSchema(schema);
         if (aggregation != null) {
-            sql = Util.buildAggregate(path, aggregation, predicates);
+            sql = Util.buildAggregate(schema, path, aggregation, predicates);
         } else {
-            sql = Util.buildProjection(path, outputSchema, predicates);
+            sql = Util.buildProjection(schema, path, outputSchema, predicates);
         }
         // System.out.println("schema: " + kite_schema);
         // System.out.println("sql: " + sql);
