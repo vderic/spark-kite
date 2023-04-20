@@ -1,5 +1,9 @@
 import org.apache.spark.sql.{Row, SparkSession}
 import org.apache.spark.sql.types.{IntegerType, StringType, StructType, StructField, LongType, DecimalType, DoubleType, DateType}
+import java.time.LocalDateTime
+import java.time.Duration
+
+
 
 val schema = StructType(Array(
     StructField("l_orderkey", LongType),
@@ -29,5 +33,12 @@ val df = dfr.load()
 
 df.createOrReplaceTempView("lineitem")
 
+val start = LocalDateTime.now()
+
 spark.sql("select l_linestatus, avg(l_discount) from lineitem group by l_linestatus").show()
 
+val end = LocalDateTime.now()
+
+val duration = Duration.between(start, end)
+
+println("Duration = " + duration.toMillis() + "ms")
