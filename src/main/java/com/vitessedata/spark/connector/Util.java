@@ -7,6 +7,7 @@ import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.DecimalType;
+import org.apache.spark.sql.types.ArrayType;
 import org.apache.spark.sql.util.CaseInsensitiveStringMap;
 import org.apache.spark.sql.connector.read.SupportsPushDownAggregates;
 import org.apache.spark.sql.connector.read.SupportsPushDownV2Filters;
@@ -234,8 +235,40 @@ public class Util {
                 sb.append(':');
                 sb.append(dectype.scale());
                 sb.append('\n');
-            }
+            } else if (dtype instanceof ArrayType) {
+                ArrayType arrtype = (ArrayType) dtype;
+                DataType etype = arrtype.elementType();
 
+                if (etype.equals(DataTypes.ByteType)) {
+                    sb.append("int8[]:0:0\n");
+                } else if (etype.equals(DataTypes.ShortType)) {
+                    sb.append("int16[]:0:0\n");
+                } else if (etype.equals(DataTypes.IntegerType)) {
+                    sb.append("int32[]:0:0\n");
+                } else if (etype.equals(DataTypes.LongType)) {
+                    sb.append("int64[]:0:0\n");
+                } else if (etype.equals(DataTypes.FloatType)) {
+                    sb.append("float[]:0:0\n");
+                } else if (etype.equals(DataTypes.DoubleType)) {
+                    sb.append("double[]:0:0\n");
+                } else if (etype.equals(DataTypes.DateType)) {
+                    sb.append("date[]:0:0\n");
+                } else if (etype.equals(DataTypes.TimestampType)) {
+                    sb.append("timestamp[]:0:0\n");
+                } else if (etype.equals(DataTypes.StringType)) {
+                    sb.append("string[]:0:0\n");
+                } else if (etype.equals(DataTypes.BinaryType)) {
+                    sb.append("bytea[]:0:0\n");
+                } else if (etype instanceof DecimalType) {
+                    DecimalType dectype = (DecimalType) etype;
+                    sb.append("decimal[]");
+                    sb.append(':');
+                    sb.append(dectype.precision());
+                    sb.append(':');
+                    sb.append(dectype.scale());
+                    sb.append('\n');
+                }
+            }
         }
 
         return sb.toString();

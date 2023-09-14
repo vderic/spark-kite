@@ -8,6 +8,7 @@ import org.apache.spark.sql.connector.expressions.aggregate.Aggregation;
 import org.apache.spark.unsafe.types.UTF8String;
 import org.apache.spark.sql.types.DecimalType;
 import org.apache.spark.sql.types.Decimal;
+import org.apache.spark.sql.catalyst.util.GenericArrayData;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
@@ -94,6 +96,20 @@ public class KitePartitionReader implements PartitionReader<InternalRow> {
                 convertedValues[i] = Decimal.apply((BigDecimal) values[i]);
             } else if (values[i] instanceof String) {
                 convertedValues[i] = UTF8String.fromString((String) values[i]);
+            } else if (values[i] instanceof ArrayType) {
+                ArrayType arr = (ArrayType) values[i];
+                Object[] objs = arr.toArray();
+
+                for (int j = 0; j < objs.length; j++) {
+                    if (objs[j] instanceof BigInteger) {
+                        objs[j] = Decimal.apply((BigInteger) objs[j]);
+                    } else if (objs[j] instanceof BigDecimal) {
+                        objs[j] = Decimal.apply((BigDecimal) objs[j]);
+                    } else if (objs[j] instanceof String) {
+                        objs[j] = UTF8String.fromString((String) objs[j]);
+                    }
+                }
+                convertedValues[i] = new GenericArrayData(objs);
             } else {
                 convertedValues[i] = values[i];
             }

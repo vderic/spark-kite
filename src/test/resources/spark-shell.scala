@@ -35,7 +35,8 @@ df.createOrReplaceTempView("lineitem")
 
 val start = LocalDateTime.now()
 
-spark.sql("select l_linestatus, avg(l_discount) from lineitem group by l_linestatus").show()
+spark.sql("select l_linestatus, avg(l_discount) from lineitem group by l_linestatus").explain(true)
+// spark.sql("select l_linestatus, avg(l_discount) from lineitem group by l_linestatus").show()
 
 val end = LocalDateTime.now()
 
