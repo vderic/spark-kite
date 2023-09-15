@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
@@ -82,16 +84,43 @@ public class KitePartitionReader implements PartitionReader<InternalRow> {
         return currentRow;
     }
 
+    private byte[] swapInt128(byte[] i128) {
+        ByteBuffer bb = ByteBuffer.wrap(i128);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+        long low = bb.getLong();
+        long high = bb.getLong();
+        bb.order(ByteOrder.BIG_ENDIAN);
+        bb.rewind();
+        bb.putLong(high);
+        bb.putLong(low);
+        return bb.array();
+    }
+
     private InternalRow getCurrentRow(XrgIterator iter) {
         Object[] values = iter.getValues();
         byte[] flags = iter.getFlags();
         Object[] convertedValues = new Object[values.length];
+        XrgVectorHeader[] attrs = iter.getAttributes();
 
         for (int i = 0; i < values.length; i++) {
+            short ptyp = attrs[i].getPhysicalType();
+            short ltyp = attrs[i].getLogicalType();
+            int scale = attrs[i].getScale();
+            int precision = attrs[i].getPrecision();
+
             if (flags[i] != 0 || values[i] == null) {
                 convertedValues[i] = null;
-            } else if (values[i] instanceof BigInteger) {
-                convertedValues[i] = Decimal.apply((BigInteger) values[i]);
+            } else if (values[i] instanceof byte[]) {
+                if (ptyp == PhysicalTypes.INT128) {
+                    byte[] v = swapInt128((byte[]) values[i]);
+                    if (ltyp == LogicalTypes.DECIMAL) {
+                        convertedValues[i] = Decimal.apply(new BigDecimal(new BigInteger(v), scale));
+                    } else {
+                        convertedValues[i] = Decimal.apply(new BigInteger(v));
+                    }
+                } else {
+                    convertedValues[i] = values[i];
+                }
             } else if (values[i] instanceof BigDecimal) {
                 convertedValues[i] = Decimal.apply((BigDecimal) values[i]);
             } else if (values[i] instanceof String) {
@@ -99,12 +128,19 @@ public class KitePartitionReader implements PartitionReader<InternalRow> {
             } else if (values[i] instanceof ArrayType) {
                 ArrayType arr = (ArrayType) values[i];
                 Object[] objs = arr.toArray();
+                short elem_ptyp = arr.getPhysicalType();
+                short elem_ltyp = arr.getLogicalType();
 
                 for (int j = 0; j < objs.length; j++) {
-                    if (objs[j] instanceof BigInteger) {
-                        objs[j] = Decimal.apply((BigInteger) objs[j]);
-                    } else if (objs[j] instanceof BigDecimal) {
-                        objs[j] = Decimal.apply((BigDecimal) objs[j]);
+                    if (objs[j] instanceof byte[]) {
+                        if (elem_ptyp == PhysicalTypes.INT128) {
+                            byte[] v = swapInt128((byte[]) objs[j]);
+                            if (elem_ltyp == LogicalTypes.DECIMAL) {
+                                objs[j] = Decimal.apply(new BigDecimal(new BigInteger(v), scale));
+                            } else {
+                                objs[j] = Decimal.apply(new BigInteger(v));
+                            }
+                        }
                     } else if (objs[j] instanceof String) {
                         objs[j] = UTF8String.fromString((String) objs[j]);
                     }
