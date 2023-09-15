@@ -27,7 +27,7 @@ val schema = StructType(Array(
     StructField("fp64av", ArrayType(DoubleType)),
     StructField("dateav", ArrayType(DateType)),
     StructField("timestampav", ArrayType(TimestampType)),
-    StructField("dec64av", ArrayType(DecimalType(19,4))),
+    StructField("dec64av", ArrayType(DecimalType(16,4))),
     StructField("dec128av", ArrayType(DecimalType(25,4)))
 	))
 

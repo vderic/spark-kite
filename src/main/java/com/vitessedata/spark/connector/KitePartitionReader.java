@@ -141,6 +141,8 @@ public class KitePartitionReader implements PartitionReader<InternalRow> {
                                 objs[j] = Decimal.apply(new BigInteger(v));
                             }
                         }
+                    } else if (objs[j] instanceof BigDecimal) {
+                        objs[j] = Decimal.apply((BigDecimal) objs[j]);
                     } else if (objs[j] instanceof String) {
                         objs[j] = UTF8String.fromString((String) objs[j]);
                     }
