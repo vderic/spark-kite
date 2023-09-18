@@ -33,7 +33,7 @@ val schema = StructType(Array(
 
 val dfr = spark.read.format("kite").schema(schema)
         .option("host", "localhost:7878")
-        .option("path", "test_spark/spark*.parquet")
+        .option("path", "spark/spark*.parquet")
         .option("filespec", "parquet")
         .option("fragcnt", 4)
         
@@ -43,7 +43,8 @@ df.createOrReplaceTempView("all_ext")
 
 val start = LocalDateTime.now()
 
-spark.sql("select * from all_ext").show()
+spark.sql("select * from all_ext limit 10").show()
+//spark.sql("select * from all_ext").filter(array_contains(col("i16av"), 0)).show()
 // spark.sql("select l_linestatus, avg(l_discount) from lineitem group by l_linestatus").show()
 
 val end = LocalDateTime.now()
